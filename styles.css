@@ -260,8 +260,14 @@ a {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.45));
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  /* 使用柔和的半透明边框并让背景不渗到边框下，减少割裂感 */
+  background-clip: padding-box;
+  -webkit-background-clip: padding-box;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
   transition: transform 220ms ease, box-shadow 220ms ease;
+  transform-origin: center center;
 }
 
 /* 深色主题下的玻璃变换 */
@@ -270,6 +276,7 @@ a {
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
   border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.01);
 }
 
 /* 内部光点：使用伪元素并通过 CSS 变量控制位置 */
@@ -285,6 +292,7 @@ a {
   opacity: 0;
   transition: opacity 200ms ease, transform 200ms ease;
   mix-blend-mode: screen;
+  border-radius: inherit;
 }
 
 /* 当有 hover 状态时显示发光 */
@@ -328,7 +336,9 @@ a {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.22));
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
-  border-radius: 10px;
+  border-radius: inherit;
+  /* 添加一个轻微的边缘虚化来减轻图片与边框的割裂感 */
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.06);
   pointer-events: none;
 }
 
@@ -346,6 +356,31 @@ a {
 :root .friend-card.has-bg .friend-meta h4 a,
 :root .friend-card.has-bg .friend-meta p {
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* ========== 点击水波纹效果 ========== */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.6);
+  width: 1px;
+  height: 1px;
+  opacity: 0.9;
+  animation: ripple 700ms cubic-bezier(.4, 0, .2, 1);
+  z-index: 3;
+}
+
+[data-theme="dark"] .ripple {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+@keyframes ripple {
+  to {
+    transform: translate(-50%, -50%) scale(40);
+    opacity: 0;
+  }
 }
 
 [data-theme="dark"] .friend-card.has-bg .friend-meta h4 a,

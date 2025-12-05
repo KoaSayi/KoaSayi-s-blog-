@@ -71,6 +71,29 @@
             });
         }
 
+        // ============== 点击波纹函数 ==============
+        function createRipple(card, ev) {
+            try {
+                const rect = card.getBoundingClientRect();
+                const x = (ev.clientX || (ev.touches && ev.touches[0] && ev.touches[0].clientX)) - rect.left;
+                const y = (ev.clientY || (ev.touches && ev.touches[0] && ev.touches[0].clientY)) - rect.top;
+                const d = Math.max(rect.width, rect.height) * 2;
+                const span = document.createElement('span');
+                span.className = 'ripple';
+                span.style.width = span.style.height = d + 'px';
+                span.style.left = x + 'px';
+                span.style.top = y + 'px';
+                // center the circle
+                span.style.transform = 'translate(-50%, -50%) scale(0)';
+                card.appendChild(span);
+                // remove after animation
+                setTimeout(() => { try { span.remove(); } catch (e) { /* ignore */ } }, 800);
+            } catch (err) {
+                // ignore ripple errors
+                console.warn('ripple error', err);
+            }
+        }
+
         // ============== friends.json 加载与渲染 ==============
         function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
         async function loadFriends() {
@@ -113,6 +136,10 @@
                     a.style.backgroundSize = 'cover';
                     a.style.backgroundPosition = 'center';
                     a.innerHTML = `\n                        <img class="friend-avatar" src="${escapeHtml(f.avatar)}" alt="${escapeHtml(f.name)}">\n                        <div class="friend-meta">\n                          <h4><a href="${escapeHtml(f.url)}" target="_blank" rel="noopener">${escapeHtml(f.name)}</a></h4>\n                          <p>${escapeHtml(f.desc)}</p>\n                        </div>`;
+                    // 绑定点击水波纹
+                    a.addEventListener('pointerdown', e => {
+                        createRipple(a, e);
+                    });
                     container.appendChild(a);
                 });
             } catch (err) {
