@@ -81,9 +81,31 @@
                 if (!res.ok) throw new Error('fetch failed: ' + res.status);
                 const list = await res.json();
                 container.innerHTML = '';
+                // 轮流/随机使用 Background 文件夹中的图片作为卡片背景
+                const bgImages = [
+                    'image/Background/09bab1c55f9d50f524a075f812413ec4.jpg',
+                    'image/Background/16e462450f22a5bf2ab80c72cb2f1a6f.jpg',
+                    'image/Background/2d93c5cb8e4a78531e6847b350d12b97.jpg',
+                    'image/Background/553798a30b922620d87f3f572f9440a4.jpg',
+                    'image/Background/6ce40b4f0eaa4582427b0325cf2b5d1f.jpg',
+                    'image/Background/a8d9f4b373f6daa4bc56b8bcc2a4cac3.jpg',
+                    'image/Background/ac5c98139ff0c9cded8ec54b38363af7.jpg',
+                    'image/Background/b4011e307d89e152b81f8df3fad96cfa.jpg',
+                    'image/Background/ce15f7a5d8cecf21799d0d55d6f76b3e.jpg',
+                    'image/Background/d4074536be8e639d78f022833c7b81bb.jpg',
+                    'image/Background/f30e069e6c55f2bf90e17579a4dc65dd.jpg',
+                    'image/Background/fcaf575bafc94910b751ce02c547f483.jpg'
+                ];
+                let idx = 0;
                 list.forEach(f => {
                     const a = document.createElement('article');
-                    a.className = 'friend-card';
+                    a.className = 'friend-card has-bg';
+                    // 轮流选择背景图，若想随机改为 Math.floor(Math.random()*bgImages.length)
+                    const bg = bgImages[idx % bgImages.length];
+                    idx += 1;
+                    a.style.backgroundImage = `url('${bg}')`;
+                    a.style.backgroundSize = 'cover';
+                    a.style.backgroundPosition = 'center';
                     a.innerHTML = `\n                        <img class="friend-avatar" src="${escapeHtml(f.avatar)}" alt="${escapeHtml(f.name)}">\n                        <div class="friend-meta">\n                          <h4><a href="${escapeHtml(f.url)}" target="_blank" rel="noopener">${escapeHtml(f.name)}</a></h4>\n                          <p>${escapeHtml(f.desc)}</p>\n                        </div>`;
                     container.appendChild(a);
                 });
