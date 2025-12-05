@@ -4,50 +4,64 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>友链 — KoaSayi</title>
+    <title>KoaSayi-Friends!</title>
     <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
     <header class="site-header">
         <div class="wrap">
-            <h1 class="site-title">我的友链</h1>
-            <p class="site-desc">这里展示我信任并推荐的站点</p>
-            <button id="theme-toggle-friends" class="theme-toggle" aria-label="切换主题">🌙</button>
+            <h1 class="site-title">Friends</h1>
+            <p class="site-desc">是你们造就了现在的我..对此感激不尽!</p>
+            <button id="theme-toggle-friends" class="theme-toggle" aria-label="切换主题">换!</button>
         </div>
     </header>
 
     <main class="wrap">
         <section class="friends-hero">
-            <h2>友链列表</h2>
-            <p>点击标题可访问对方站点。</p>
+            <h2>Friends</h2>
+            <p>点击标题就能访问对方站点..应该吧?</p>
         </section>
 
         <section class="friends-grid">
             <!-- 示例友链 1 -->
             <article class="friend-card">
-                <img class="friend-avatar" src="https://avatars.githubusercontent.com/u/9919?s=200&v=4" alt="Friend 1">
+                <img class="friend-avatar" src="https://nahida.im/profile.png" alt="Friend 1">
                 <div class="friend-meta">
-                    <h4><a href="https://example.com" target="_blank" rel="noopener">示例站点 A</a></h4>
-                    <p>一个示例友链，介绍简介写在这里，可以是一句短句说明该站点内容。</p>
+                    <h4><a href="https://nahida.im" target="_blank" rel="noopener">Nahida</a></h4>
+                    <p>开发人员 & 开源爱好者</p>
+                    <p>为世界上一切美好而战！</p>
                 </div>
             </article>
 
             <!-- 示例友链 2 -->
             <article class="friend-card">
-                <img class="friend-avatar" src="https://www.gravatar.com/avatar/?d=identicon" alt="Friend 2">
+                <img class="friend-avatar"
+                    src="https://space.bilibili.com/647917312?spm_id_from=333.1387.fans.user_card.click" alt="Friend 2">
                 <div class="friend-meta">
-                    <h4><a href="https://example.org" target="_blank" rel="noopener">示例站点 B</a></h4>
-                    <p>另一条友链的简介，简洁说明该站点的主题与联系方式。</p>
+                    <h4><a href="http://blog.satolinmao.top" target="_blank" rel="noopener">sato_linmao</a></h4>
+                    <p>代码是我的魔法，键盘是我的武器，打造属于自己的次元世界！</p>
                 </div>
             </article>
 
             <!-- 示例友链 3 -->
             <article class="friend-card">
-                <img class="friend-avatar" src="https://placehold.co/80x80" alt="Friend 3">
+                <img class="friend-avatar" src="https://s2.loli.net/2025/08/05/vW2pnGsJOAd6qEX.jpg" alt="Friend 3">
                 <div class="friend-meta">
-                    <h4><a href="https://example.net" target="_blank" rel="noopener">示例站点 C</a></h4>
-                    <p>演示用简介：技术博客、教程或个人主页都可以放在此处。</p>
+                    <h4><a href="https://blog.vacu.top/" target="_blank" rel="noopener">VacuolePao</a></h4>
+                    <p>一介书生,三尺微命。</p>
+                </div>
+            </article>
+            <!-- 示例友链 1 -->
+            <article class="friend-card">
+                <img class="friend-avatar" src="https://avatars.githubusercontent.com/u/111939263?v=4" alt="Friend 4">
+                <div class="friend-meta">
+                    <h4><a href="https://share121.github.io/blog/" target="_blank" rel="noopener">Share121</a></h4>
+                    <p>记录生活中的点滴，分享自己的感悟和经历
+                        分享技术心得，探讨技术问题，共同进步
+                        记录学习过程中的笔记，总结经验，提高自己的技术水平
+                    </p>
+                    <p>KoaSayi P.S:网址不知道咋回事</p>
                 </div>
             </article>
 
@@ -59,7 +73,7 @@
     <footer class="site-footer">
         <div class="wrap footer-row">
             <p>© 2025 KoaSayi。</p>
-            <div class="footer-right"><a class="friend-link-btn" href="friends.html">友链</a></div>
+            <div class="footer-right"><a class="friend-link-btn" href="friends.html">副驾驶把友链的链接页放这来了，我不知道为什么..</a></div>
         </div>
     </footer>
 
@@ -74,7 +88,7 @@
         const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         const apply = (isDark) => {
             doc.setAttribute('data-theme', isDark ? 'dark' : 'light');
-            if (toggle) toggle.textContent = isDark ? '☀️' : '🌙';
+            if (toggle) toggle.textContent = isDark ? '我怕暗' : '我怕亮';
             if (toggle) toggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
         };
         // 初始化
