@@ -99,42 +99,21 @@
                 let idx = 0;
                 list.forEach(f => {
                     const a = document.createElement('article');
-                    a.className = 'friend-card';
-                    // 允许每个 friend 在 JSON 中指定专属背景（f.bg），否则轮流分配
-                    const bg = f.bg ? f.bg : bgImages[idx % bgImages.length];
-                    idx += 1;
-                    if (bg) {
-                        a.classList.add('has-bg');
-                        a.style.backgroundImage = `url('${bg}')`;
-                        a.style.backgroundSize = 'cover';
-                        a.style.backgroundPosition = 'center';
+                    a.className = 'friend-card has-bg';
+                    // 若是 Nahida 指定使用本地 Nahidahome.jpg，否则轮流选择背景图
+                    let bg;
+                    if (f.name && String(f.name).toLowerCase() === 'nahida') {
+                        bg = 'image/Background/Nahidahome.jpg';
+                    } else {
+                        // 轮流选择背景图，若想随机改为 Math.floor(Math.random()*bgImages.length)
+                        bg = bgImages[idx % bgImages.length];
+                        idx += 1;
                     }
+                    a.style.backgroundImage = `url('${bg}')`;
+                    a.style.backgroundSize = 'cover';
+                    a.style.backgroundPosition = 'center';
                     a.innerHTML = `\n                        <img class="friend-avatar" src="${escapeHtml(f.avatar)}" alt="${escapeHtml(f.name)}">\n                        <div class="friend-meta">\n                          <h4><a href="${escapeHtml(f.url)}" target="_blank" rel="noopener">${escapeHtml(f.name)}</a></h4>\n                          <p>${escapeHtml(f.desc)}</p>\n                        </div>`;
                     container.appendChild(a);
-
-                    // 为单个卡片绑定鼠标/触摸事件：只有当前交互的卡片会显示发光与抬起
-                    (function (card) {
-                        function onMove(clientX, clientY) {
-                            const r = card.getBoundingClientRect();
-                            const x = clientX - r.left;
-                            const y = clientY - r.top;
-                            if (x < 0 || y < 0 || x > r.width || y > r.height) return;
-                            const px = (x / r.width) * 100;
-                            const py = (y / r.height) * 100;
-                            card.style.setProperty('--mx', px + '%');
-                            card.style.setProperty('--my', py + '%');
-                            card.classList.add('hovering');
-                        }
-                        function onLeave() {
-                            card.style.removeProperty('--mx');
-                            card.style.removeProperty('--my');
-                            card.classList.remove('hovering');
-                        }
-                        card.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
-                        card.addEventListener('mouseleave', onLeave);
-                        card.addEventListener('touchmove', e => { const t = e.touches[0]; if (t) onMove(t.clientX, t.clientY); }, { passive: true });
-                        card.addEventListener('touchend', onLeave);
-                    })(a);
                 });
             } catch (err) {
                 console.error('loadFriends error', err);
@@ -149,54 +128,62 @@
         function setupMouseGlow() {
             const container = document.getElementById('friends-grid');
             if (!container) return;
-            // 为动态创建的 card 绑定 mousemove
-            container.addEventListener('mousemove', e => {
-                const cards = container.querySelectorAll('.friend-card');
-                cards.forEach(card => {
+            let lastCard = null;
+
+            function clearCard(card) {
+                if (!card) return;
+                card.style.removeProperty('--mx');
+                card.style.removeProperty('--my');
+                card.classList.remove('hovering');
+            }
+
+            function onPointer(x, y) {
+                const el = document.elementFromPoint(x, y);
+                if (!el) return;
+                const card = el.closest && el.closest('.friend-card');
+                if (card === lastCard) {
+                    // 更新位置 only for lastCard
                     const r = card.getBoundingClientRect();
-                    const x = e.clientX - r.left;
-                    const y = e.clientY - r.top;
-                    const px = (x / r.width) * 100;
-                    const py = (y / r.height) * 100;
-                    card.style.setProperty('--mx', px + '%');
-                    card.style.setProperty('--my', py + '%');
+                    const px = ((x - r.left) / r.width) * 100;
+                    const py = ((y - r.top) / r.height) * 100;
+                    card.style.setProperty('--mx', Math.max(0, Math.min(100, px)) + '%');
+                    card.style.setProperty('--my', Math.max(0, Math.min(100, py)) + '%');
+                    return;
+                }
+                // moved to a new card
+                if (lastCard) clearCard(lastCard);
+                if (card) {
+                    lastCard = card;
+                    const r = card.getBoundingClientRect();
+                    const px = ((x - r.left) / r.width) * 100;
+                    const py = ((y - r.top) / r.height) * 100;
+                    card.style.setProperty('--mx', Math.max(0, Math.min(100, px)) + '%');
+                    card.style.setProperty('--my', Math.max(0, Math.min(100, py)) + '%');
                     card.classList.add('hovering');
-                });
+                } else {
+                    lastCard = null;
+                }
+            }
+
+            container.addEventListener('mousemove', e => {
+                onPointer(e.clientX, e.clientY);
             });
             container.addEventListener('mouseleave', () => {
-                const cards = container.querySelectorAll('.friend-card');
-                cards.forEach(card => {
-                    card.style.removeProperty('--mx');
-                    card.style.removeProperty('--my');
-                    card.classList.remove('hovering');
-                });
+                if (lastCard) clearCard(lastCard);
+                lastCard = null;
             });
 
-            // 支持触摸移动（移动手指时更新光点）
+            // touch support
             container.addEventListener('touchmove', e => {
-                const touch = e.touches[0];
-                if (!touch) return;
-                const cards = container.querySelectorAll('.friend-card');
-                cards.forEach(card => {
-                    const r = card.getBoundingClientRect();
-                    const x = touch.clientX - r.left;
-                    const y = touch.clientY - r.top;
-                    const px = (x / r.width) * 100;
-                    const py = (y / r.height) * 100;
-                    card.style.setProperty('--mx', px + '%');
-                    card.style.setProperty('--my', py + '%');
-                    card.classList.add('hovering');
-                });
+                const t = e.touches[0]; if (!t) return;
+                onPointer(t.clientX, t.clientY);
             }, { passive: true });
             container.addEventListener('touchend', () => {
-                const cards = container.querySelectorAll('.friend-card');
-                cards.forEach(card => {
-                    card.style.removeProperty('--mx');
-                    card.style.removeProperty('--my');
-                    card.classList.remove('hovering');
-                });
+                if (lastCard) clearCard(lastCard);
+                lastCard = null;
             });
         }
+
     })();
 </script>
 
