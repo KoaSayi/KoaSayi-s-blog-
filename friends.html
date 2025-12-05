@@ -92,7 +92,62 @@
                 container.innerHTML = '<p>加载友链失败，请稍后重试。</p>';
             }
         }
-        loadFriends();
+        // 加载完后绑定鼠标移动效果
+        loadFriends().then(() => {
+            setupMouseGlow();
+        });
+
+        function setupMouseGlow() {
+            const container = document.getElementById('friends-grid');
+            if (!container) return;
+            // 为动态创建的 card 绑定 mousemove
+            container.addEventListener('mousemove', e => {
+                const cards = container.querySelectorAll('.friend-card');
+                cards.forEach(card => {
+                    const r = card.getBoundingClientRect();
+                    const x = e.clientX - r.left;
+                    const y = e.clientY - r.top;
+                    const px = (x / r.width) * 100;
+                    const py = (y / r.height) * 100;
+                    card.style.setProperty('--mx', px + '%');
+                    card.style.setProperty('--my', py + '%');
+                    card.classList.add('hovering');
+                });
+            });
+            container.addEventListener('mouseleave', () => {
+                const cards = container.querySelectorAll('.friend-card');
+                cards.forEach(card => {
+                    card.style.removeProperty('--mx');
+                    card.style.removeProperty('--my');
+                    card.classList.remove('hovering');
+                });
+            });
+
+            // 支持触摸移动（移动手指时更新光点）
+            container.addEventListener('touchmove', e => {
+                const touch = e.touches[0];
+                if (!touch) return;
+                const cards = container.querySelectorAll('.friend-card');
+                cards.forEach(card => {
+                    const r = card.getBoundingClientRect();
+                    const x = touch.clientX - r.left;
+                    const y = touch.clientY - r.top;
+                    const px = (x / r.width) * 100;
+                    const py = (y / r.height) * 100;
+                    card.style.setProperty('--mx', px + '%');
+                    card.style.setProperty('--my', py + '%');
+                    card.classList.add('hovering');
+                });
+            }, { passive: true });
+            container.addEventListener('touchend', () => {
+                const cards = container.querySelectorAll('.friend-card');
+                cards.forEach(card => {
+                    card.style.removeProperty('--mx');
+                    card.style.removeProperty('--my');
+                    card.classList.remove('hovering');
+                });
+            });
+        }
     })();
 </script>
 

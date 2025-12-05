@@ -251,6 +251,71 @@ a {
   color: inherit
 }
 
+/* ========== Liquid glass + 鼠标发光效果 ========== */
+.friend-card {
+  position: relative;
+  /* for glow pseudo */
+  overflow: hidden;
+  /* 半透明玻璃背景 */
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.45));
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+/* 深色主题下的玻璃变换 */
+[data-theme="dark"] .friend-card {
+  background: linear-gradient(180deg, rgba(16, 22, 34, 0.35), rgba(14, 18, 28, 0.28));
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* 内部光点：使用伪元素并通过 CSS 变量控制位置 */
+.friend-card::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(96, 165, 250, 0.20), rgba(96, 165, 250, 0.06) 20%, transparent 40%);
+  opacity: 0;
+  transition: opacity 200ms ease, transform 200ms ease;
+  mix-blend-mode: screen;
+}
+
+/* 当有 hover 状态时显示发光 */
+.friend-card.hovering::after {
+  opacity: 1;
+}
+
+/* 白色模式下同时增强投影以制造立体效果 */
+@media (prefers-color-scheme: light),
+(prefers-color-scheme: no-preference) {
+  [data-theme="dark"] .friend-card {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  }
+
+  :root .friend-card {
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+  }
+}
+
+/* 深色模式下的微妙高光 */
+[data-theme="dark"] .friend-card::after {
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(96, 165, 250, 0.15), rgba(96, 165, 250, 0.03) 18%, transparent 36%);
+  mix-blend-mode: screen;
+}
+
+/* 鼠标靠近时轻微提升卡片 */
+.friend-card.hovering {
+  transform: translateY(-6px) scale(1.01);
+}
+
+
 /* 小屏幕调整 */
 @media(max-width:480px) {
   .theme-toggle {
