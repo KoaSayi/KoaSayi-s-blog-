@@ -24,53 +24,8 @@
             <p>点击标题就能访问对方站点..应该吧?</p>
         </section>
 
-        <section class="friends-grid">
-            <!-- 示例友链 1 -->
-            <article class="friend-card">
-                <img class="friend-avatar" src="https://nahida.im/profile.png" alt="Friend 1">
-                <div class="friend-meta">
-                    <h4><a href="https://nahida.im" target="_blank" rel="noopener">Nahida</a></h4>
-                    <p>开发人员 & 开源爱好者</p>
-                    <p>为世界上一切美好而战！</p>
-                </div>
-            </article>
-
-            <!-- 示例友链 2 -->
-            <article class="friend-card">
-                <img class="friend-avatar"
-                    src="https://space.bilibili.com/647917312?spm_id_from=333.1387.fans.user_card.click" alt="Friend 2">
-                <div class="friend-meta">
-                    <h4><a href="http://blog.satolinmao.top" target="_blank" rel="noopener">sato_linmao</a></h4>
-                    <p>代码是我的魔法，键盘是我的武器，打造属于自己的次元世界！</p>
-                </div>
-            </article>
-
-            <!-- 示例友链 3 -->
-            <article class="friend-card">
-                <img class="friend-avatar" src="https://s2.loli.net/2025/08/05/vW2pnGsJOAd6qEX.jpg" alt="Friend 3">
-                <div class="friend-meta">
-                    <h4><a href="https://blog.vacu.top/" target="_blank" rel="noopener">VacuolePao</a></h4>
-                    <p>一介书生,三尺微命。</p>
-                </div>
-            </article>
-
-            <!-- 示例友链 4 -->
-            <article class="friend-card">
-                <img class="friend-avatar" src="https://avatars.githubusercontent.com/u/111939263?v=4" alt="Friend 4">
-                <div class="friend-meta">
-                    <h4><a href="https://share121.github.io/blog/" target="_blank" rel="noopener">Share121</a></h4>
-                    <p>记录生活中的点滴，分享自己的感悟和经历<br>分享技术心得，探讨技术问题，共同进步<br>记录学习过程中的笔记，总结经验，提高自己的技术水平
-                    </p>
-                    <p>KoaSayi P.S:网址不知道咋回事</p>
-                </div>
-            </article>
-
-            <!-- 示例友链 3 -->
-            <article class="friend-card">
-                <img class="friend-avatar" src="http://furina64.dpdns.org/profile.png" alt="Friend 3">
-                <div class="friend-meta">
-                    <h4><a href="http://furina64.dpdns.org/" target="_blank" rel="noopener">Furina</a></h4>
-                    <p>开源 · 共享 · 便捷 · 实用</p>
+        <section class="friends-grid" id="friends-grid">
+            <!-- 由 friends.json 动态渲染友链卡片 -->
         </section>
 
         <p style="margin-top:1rem"><a href="index.html">← 返回首页</a></p>
@@ -115,6 +70,29 @@
                 if (!localStorage.getItem('theme')) apply(e.matches);
             });
         }
+
+        // ============== friends.json 加载与渲染 ==============
+        function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        async function loadFriends() {
+            const container = document.getElementById('friends-grid');
+            if (!container) { console.warn('friends-grid not found'); return; }
+            try {
+                const res = await fetch('friends.json', { cache: 'no-store' });
+                if (!res.ok) throw new Error('fetch failed: ' + res.status);
+                const list = await res.json();
+                container.innerHTML = '';
+                list.forEach(f => {
+                    const a = document.createElement('article');
+                    a.className = 'friend-card';
+                    a.innerHTML = `\n                        <img class="friend-avatar" src="${escapeHtml(f.avatar)}" alt="${escapeHtml(f.name)}">\n                        <div class="friend-meta">\n                          <h4><a href="${escapeHtml(f.url)}" target="_blank" rel="noopener">${escapeHtml(f.name)}</a></h4>\n                          <p>${escapeHtml(f.desc)}</p>\n                        </div>`;
+                    container.appendChild(a);
+                });
+            } catch (err) {
+                console.error('loadFriends error', err);
+                container.innerHTML = '<p>加载友链失败，请稍后重试。</p>';
+            }
+        }
+        loadFriends();
     })();
 </script>
 
