@@ -3,7 +3,8 @@
         "name": "Nahida",
         "url": "https://nahida.im",
         "avatar": "https://nahida.im/profile.png",
-        "desc": "为世界上一切美好而战!"
+        "desc": "为世界上一切美好而战!",
+        "bg": "image/Background/Nahidahome.jpg"
     },
     {
         "name": "Furina",
@@ -15,7 +16,7 @@
         "name": "Share121",
         "url": "https://share121.github.io/blog/",
         "avatar": "https://avatars.githubusercontent.com/u/111939263?v=4",
-        "desc": "演示用简介：技术博客、教程或个人主页都可以放在此处。"
+        "desc": "分享好东西"
     },
     {
         "name": "VacuolePao",

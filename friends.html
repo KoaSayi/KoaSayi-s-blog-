@@ -99,15 +99,42 @@
                 let idx = 0;
                 list.forEach(f => {
                     const a = document.createElement('article');
-                    a.className = 'friend-card has-bg';
-                    // 轮流选择背景图，若想随机改为 Math.floor(Math.random()*bgImages.length)
-                    const bg = bgImages[idx % bgImages.length];
+                    a.className = 'friend-card';
+                    // 允许每个 friend 在 JSON 中指定专属背景（f.bg），否则轮流分配
+                    const bg = f.bg ? f.bg : bgImages[idx % bgImages.length];
                     idx += 1;
-                    a.style.backgroundImage = `url('${bg}')`;
-                    a.style.backgroundSize = 'cover';
-                    a.style.backgroundPosition = 'center';
+                    if (bg) {
+                        a.classList.add('has-bg');
+                        a.style.backgroundImage = `url('${bg}')`;
+                        a.style.backgroundSize = 'cover';
+                        a.style.backgroundPosition = 'center';
+                    }
                     a.innerHTML = `\n                        <img class="friend-avatar" src="${escapeHtml(f.avatar)}" alt="${escapeHtml(f.name)}">\n                        <div class="friend-meta">\n                          <h4><a href="${escapeHtml(f.url)}" target="_blank" rel="noopener">${escapeHtml(f.name)}</a></h4>\n                          <p>${escapeHtml(f.desc)}</p>\n                        </div>`;
                     container.appendChild(a);
+
+                    // 为单个卡片绑定鼠标/触摸事件：只有当前交互的卡片会显示发光与抬起
+                    (function (card) {
+                        function onMove(clientX, clientY) {
+                            const r = card.getBoundingClientRect();
+                            const x = clientX - r.left;
+                            const y = clientY - r.top;
+                            if (x < 0 || y < 0 || x > r.width || y > r.height) return;
+                            const px = (x / r.width) * 100;
+                            const py = (y / r.height) * 100;
+                            card.style.setProperty('--mx', px + '%');
+                            card.style.setProperty('--my', py + '%');
+                            card.classList.add('hovering');
+                        }
+                        function onLeave() {
+                            card.style.removeProperty('--mx');
+                            card.style.removeProperty('--my');
+                            card.classList.remove('hovering');
+                        }
+                        card.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
+                        card.addEventListener('mouseleave', onLeave);
+                        card.addEventListener('touchmove', e => { const t = e.touches[0]; if (t) onMove(t.clientX, t.clientY); }, { passive: true });
+                        card.addEventListener('touchend', onLeave);
+                    })(a);
                 });
             } catch (err) {
                 console.error('loadFriends error', err);
