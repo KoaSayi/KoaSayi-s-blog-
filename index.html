@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KoaSayi</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <h1 class="site-title">KoaSayi</h1>
+      <p class="site-desc">IT-服务、交流与发展</p>
+      <button id="theme-toggle" class="theme-toggle" aria-label="切换主题">🌙</button>
+    </div>
+  </header>
+
+  <nav class="site-nav">
+    <div class="wrap">
+      <a href="#">home</a>
+      <a href="#about">about</a>
+    </div>
+  </nav>
+
+  <main class="wrap main-grid">
+    <section class="content">
+
+      <article class="post">
+        <h2 class="post-title">示例文章：如何写一个简洁的博客</h2>
+        <p class="post-meta">2025-12-04 · 分类：前端 · 阅读：3 分钟</p>
+        <p>这是一个示例文章，展示一个极简静态博客的排版。你可以把多篇文章直接写到 HTML 中，或者将文章拆成独立的 HTML/MD 文件并在生成阶段合并。</p>
+        <p><a class="read-more" href="#">阅读更多 →</a></p>
+      </article>
+
+      <article class="post">
+        <h2 class="post-title">示例文章：部署到 GitHub Pages</h2>
+        <p class="post-meta">2025-12-04 · 分类：部署</p>
+        <p>将这个目录推到 GitHub 仓库并启用 GitHub Pages，即可快速获得一个托管的博客。README 中有具体步骤和 PowerShell 命令示例。</p>
+        <p><a class="read-more" href="#">阅读更多 →</a></p>
+      </article>
+
+    </section>
+
+    <aside class="sidebar">
+      <div class="card">
+        <h3>about KoaSayi</h3>
+        <p>只是一个初三学生。现在上海定居。</p>
+      </div>
+
+      <div class="card">
+        <h3>contact</h3>
+        <p>邮箱：hdb97028@gmail.com</p>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>© 2025 感谢您信任KoaSayi。</p>
+    </div>
+  </footer>
+
+</body>
+
+<script>
+  (function () {
+    const toggle = document.getElementById('theme-toggle');
+    const doc = document.documentElement;
+    const stored = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // 初始化主题
+    if (stored === 'dark' || (!stored && prefersDark)) doc.setAttribute('data-theme', 'dark');
+    else doc.setAttribute('data-theme', 'light');
+
+    function updateIcon() {
+      const isDark = doc.getAttribute('data-theme') === 'dark';
+      if (toggle) toggle.textContent = isDark ? '☀️' : '🌙';
+    }
+
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        const isDark = doc.getAttribute('data-theme') === 'dark';
+        const next = isDark ? 'light' : 'dark';
+        doc.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        updateIcon();
+      });
+    }
+
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        const storedNow = localStorage.getItem('theme');
+        if (!storedNow) {
+          doc.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+          updateIcon();
+        }
+      });
+    }
+
+    updateIcon();
+  })();
+</script>
+
+</html>
