@@ -13,6 +13,7 @@
         <div class="wrap">
             <h1 class="site-title">我的友链</h1>
             <p class="site-desc">这里展示我信任并推荐的站点</p>
+            <button id="theme-toggle-friends" class="theme-toggle" aria-label="切换主题">🌙</button>
         </div>
     </header>
 
@@ -63,5 +64,38 @@
     </footer>
 
 </body>
+
+<script>
+    (function () {
+        const toggle = document.getElementById('theme-toggle-friends');
+        const doc = document.documentElement;
+        // 优先使用 localStorage 的主题设置；没有时跟随系统偏好
+        const stored = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const apply = (isDark) => {
+            doc.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            if (toggle) toggle.textContent = isDark ? '☀️' : '🌙';
+            if (toggle) toggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+        };
+        // 初始化
+        if (stored === 'dark' || (stored === null && prefersDark)) apply(true);
+        else apply(false);
+
+        if (toggle) {
+            toggle.addEventListener('click', () => {
+                const isDark = doc.getAttribute('data-theme') === 'dark';
+                const next = !isDark;
+                apply(next);
+                localStorage.setItem('theme', next ? 'dark' : 'light');
+            });
+        }
+        // 监听系统偏好变化（如果用户未设置 localStorage）
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                if (!localStorage.getItem('theme')) apply(e.matches);
+            });
+        }
+    })();
+</script>
 
 </html>
