@@ -13,7 +13,7 @@
     <div class="wrap">
       <h1 class="site-title">KoaSayi</h1>
       <p class="site-desc">IT-服务、交流与发展</p>
-      <button id="theme-toggle" class="theme-toggle" aria-label="切换主题">🌙</button>
+      <button id="theme-toggle" class="theme-toggle" aria-label="切换主题">换！</button>
     </div>
   </header>
 
@@ -58,7 +58,7 @@
 
   <footer class="site-footer">
     <div class="wrap">
-      <p>© 2025 感谢您信任KoaSayi。</p>
+      <p>© 2025 KoaSayi。</p>
     </div>
   </footer>
 
@@ -76,7 +76,7 @@
 
     function updateIcon() {
       const isDark = doc.getAttribute('data-theme') === 'dark';
-      if (toggle) toggle.textContent = isDark ? '☀️' : '🌙';
+      if (toggle) toggle.textContent = isDark ? '我怕暗' : '我怕亮';
     }
 
     if (toggle) {
