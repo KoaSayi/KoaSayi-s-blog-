@@ -326,6 +326,10 @@ a {
 /* 支持有背景图的卡片：在背景图上放一层半透明的模糊玻璃层 */
 .friend-card.has-bg {
   color: var(--text);
+  /* 确保内联或外部的 background-image 不重复并正确覆盖卡片 */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }
 
 .friend-card.has-bg::before {
