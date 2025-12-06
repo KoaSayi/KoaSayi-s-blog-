@@ -133,9 +133,29 @@
 <script>
   (function () {
     // 玻璃碎裂与修复逻辑（首页 aero-card）
-    const cards = document.querySelectorAll('.aero-card');
     const repairBtn = document.getElementById('repair-btn');
     const clickState = new WeakMap();
+
+    // 如果页面中还有传统的 .card 元素（比如 sidebar），将它们替换为 .aero-card，放入 .aero-grid
+    (function convertSidebarCards() {
+      const aside = document.querySelector('.sidebar');
+      if (!aside) return;
+      const existingGrid = aside.querySelector('.aero-grid');
+      const cards = Array.from(aside.querySelectorAll('.card'));
+      if (cards.length === 0) return;
+      // 如果已有 aero-grid，直接把 .card 转为 .aero-card 并 append
+      let grid = existingGrid;
+      if (!grid) {
+        grid = document.createElement('div');
+        grid.className = 'aero-grid';
+        aside.appendChild(grid);
+      }
+      cards.forEach(c => {
+        c.classList.remove('card');
+        c.classList.add('aero-card');
+        grid.appendChild(c);
+      });
+    })();
 
     function resetCount(card) {
       const s = clickState.get(card) || { count: 0, timer: null };
@@ -145,7 +165,6 @@
     }
 
     function incrementClick(card) {
-      const now = Date.now();
       const s = clickState.get(card) || { count: 0, timer: null };
       s.count += 1;
       if (s.timer) clearTimeout(s.timer);
@@ -153,10 +172,6 @@
       s.timer = setTimeout(() => { s.count = 0; s.timer = null; clickState.set(card, s); }, 1200);
       clickState.set(card, s);
       return s.count;
-    }
-
-    function anyShattered() {
-      return document.querySelector('.aero-card.shattered') !== null;
     }
 
     function showRepair(yes) {
@@ -180,17 +195,28 @@
       showRepair(false);
     }
 
-    cards.forEach(card => {
-      card.addEventListener('pointerdown', e => {
-        // 只有左键/触控计数
-        if (e.pointerType === 'mouse' && e.button !== 0) return;
-        const cnt = incrementClick(card);
-        if (cnt >= 5) {
-          shatter(card);
-          resetCount(card);
-        }
+    // 绑定事件：支持 pointerdown 且在不支持 pointer 的环境下回退到 click
+    function bindShatterHandlers() {
+      const cards = document.querySelectorAll('.aero-card');
+      cards.forEach(card => {
+        // pointerdown handler
+        card.addEventListener('pointerdown', e => {
+          // 只有左键/触控计数
+          if (e.pointerType === 'mouse' && e.button !== 0) return;
+          const cnt = incrementClick(card);
+          if (cnt >= 5) { shatter(card); resetCount(card); }
+        });
+        // click fallback for environments not firing pointerdown consistently
+        card.addEventListener('click', e => {
+          // ignore non-primary buttons
+          if (e.button && e.button !== 0) return;
+          const cnt = incrementClick(card);
+          if (cnt >= 5) { shatter(card); resetCount(card); }
+        });
       });
-    });
+    }
+
+    bindShatterHandlers();
 
     if (repairBtn) {
       repairBtn.addEventListener('click', repairAll);

@@ -260,6 +260,13 @@ a {
   color: inherit
 }
 
+/* Ensure repair button stays on right-bottom even if other rules interfere */
+#repair-btn {
+  left: auto !important;
+  right: 18px !important;
+  bottom: 18px !important;
+}
+
 /* ========== 玻璃被打碎样式 ========== */
 .aero-card.shattered {
   /* 微微塌陷并降低内容可交互性视觉 */
