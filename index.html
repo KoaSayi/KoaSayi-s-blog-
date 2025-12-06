@@ -60,22 +60,22 @@
 
       <!-- 四个 Windows Aero 风格的方块 -->
       <div class="aero-grid">
-        <div class="aero-card">
+        <a class="aero-card" href="#quick-links">
           <h4>Quick Links</h4>
           <p>常用链接，方便访问。</p>
-        </div>
-        <div class="aero-card">
+        </a>
+        <a class="aero-card" href="#latest">
           <h4>Latest</h4>
           <p>最近的更新与日志。</p>
-        </div>
-        <div class="aero-card">
+        </a>
+        <a class="aero-card" href="#projects">
           <h4>Projects</h4>
           <p>正在进行的项目预览。</p>
-        </div>
-        <div class="aero-card">
+        </a>
+        <a class="aero-card" href="#tips">
           <h4>Tips</h4>
           <p>小技巧与学习资源。</p>
-        </div>
+        </a>
       </div>
     </aside>
   </main>
@@ -183,6 +183,9 @@
     function shatter(card) {
       if (!card) return;
       if (card.classList.contains('shattered')) return;
+      // choose a random crack variant
+      const variant = Math.floor(Math.random() * 3) + 1;
+      card.dataset.crack = variant;
       card.classList.add('shattered');
       // 短暂抖动
       card.classList.add('aero-shake');
