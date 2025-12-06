@@ -138,7 +138,8 @@
                     a.style.backgroundImage = `url('${bg}')`;
                     a.style.backgroundSize = 'cover';
                     a.style.backgroundPosition = 'center';
-                    a.innerHTML = `\n                        <img class="friend-avatar" src="${escapeHtml(f.avatar)}" alt="${escapeHtml(f.name)}">\n                        <div class="friend-meta">\n                          <h4><a href="${escapeHtml(f.url)}" target="_blank" rel="noopener">${escapeHtml(f.name)}</a></h4>\n                          <p>${escapeHtml(f.desc)}</p>\n                        </div>`;
+                    const url = f.url ? escapeHtml(f.url) : '#';
+                    a.innerHTML = `\n                        <img class="friend-avatar" src="${escapeHtml(f.avatar || '')}" alt="${escapeHtml(f.name)}">\n                        <div class="friend-meta">\n                          <h4><a href="${url}" target="_blank" rel="noopener">${escapeHtml(f.name)}</a></h4>\n                          <p>${escapeHtml(f.desc || '')}</p>\n                        </div>`;
                     // 绑定点击水波纹，并使整个卡片可点击（跳转到 friend.url）
                     a.style.cursor = 'pointer';
                     a.addEventListener('pointerdown', e => {
@@ -180,6 +181,13 @@
                 const el = document.elementFromPoint(x, y);
                 if (!el) return;
                 const card = el.closest && el.closest('.friend-card');
+                // 如果没有命中 card，则清理上一个被 hover 的 card 并返回
+                if (!card) {
+                    if (lastCard) clearCard(lastCard);
+                    lastCard = null;
+                    return;
+                }
+                // 到这里 card 一定存在
                 if (card === lastCard) {
                     // 更新位置 only for lastCard
                     const r = card.getBoundingClientRect();
@@ -191,17 +199,13 @@
                 }
                 // moved to a new card
                 if (lastCard) clearCard(lastCard);
-                if (card) {
-                    lastCard = card;
-                    const r = card.getBoundingClientRect();
-                    const px = ((x - r.left) / r.width) * 100;
-                    const py = ((y - r.top) / r.height) * 100;
-                    card.style.setProperty('--mx', Math.max(0, Math.min(100, px)) + '%');
-                    card.style.setProperty('--my', Math.max(0, Math.min(100, py)) + '%');
-                    card.classList.add('hovering');
-                } else {
-                    lastCard = null;
-                }
+                lastCard = card;
+                const r = card.getBoundingClientRect();
+                const px = ((x - r.left) / r.width) * 100;
+                const py = ((y - r.top) / r.height) * 100;
+                card.style.setProperty('--mx', Math.max(0, Math.min(100, px)) + '%');
+                card.style.setProperty('--my', Math.max(0, Math.min(100, py)) + '%');
+                card.classList.add('hovering');
             }
 
             container.addEventListener('mousemove', e => {
