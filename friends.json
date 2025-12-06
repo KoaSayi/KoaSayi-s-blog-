@@ -3,8 +3,7 @@
         "name": "Nahida",
         "url": "https://nahida.im",
         "avatar": "https://nahida.im/profile.png",
-        "desc": "为世界上一切美好而战!",
-        "bg": "image/Background/Nahidahome.jpg"
+        "desc": "为世界上一切美好而战!"
     },
     {
         "name": "Furina",
@@ -23,5 +22,10 @@
         "url": "https://blog.vacu.top/",
         "avatar": "https://s2.loli.net/2025/08/05/vW2pnGsJOAd6qEX.jpg",
         "desc": "一介书生,三尺微命。"
+    },
+    {
+        "name": "sato_linmao",
+        "url": "https://blog.satolinmao.top/",
+        "desc": "代码是我的魔法，键盘是我的武器，打造属于自己的次元世界！"
     }
 ]
