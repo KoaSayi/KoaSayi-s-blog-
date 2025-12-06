@@ -86,6 +86,9 @@
     </div>
   </footer>
 
+  <!-- 修复玻璃按钮（默认隐藏） -->
+  <button id="repair-btn" aria-hidden="true">一键修复</button>
+
 </body>
 
 <script>
@@ -124,6 +127,76 @@
     }
 
     updateIcon();
+  })();
+</script>
+
+<script>
+  (function () {
+    // 玻璃碎裂与修复逻辑（首页 aero-card）
+    const cards = document.querySelectorAll('.aero-card');
+    const repairBtn = document.getElementById('repair-btn');
+    const clickState = new WeakMap();
+
+    function resetCount(card) {
+      const s = clickState.get(card) || { count: 0, timer: null };
+      s.count = 0;
+      if (s.timer) { clearTimeout(s.timer); s.timer = null; }
+      clickState.set(card, s);
+    }
+
+    function incrementClick(card) {
+      const now = Date.now();
+      const s = clickState.get(card) || { count: 0, timer: null };
+      s.count += 1;
+      if (s.timer) clearTimeout(s.timer);
+      // 若 1.2s 内无新点击则重置计数
+      s.timer = setTimeout(() => { s.count = 0; s.timer = null; clickState.set(card, s); }, 1200);
+      clickState.set(card, s);
+      return s.count;
+    }
+
+    function anyShattered() {
+      return document.querySelector('.aero-card.shattered') !== null;
+    }
+
+    function showRepair(yes) {
+      if (!repairBtn) return;
+      if (yes) { repairBtn.classList.add('visible'); repairBtn.setAttribute('aria-hidden', 'false'); }
+      else { repairBtn.classList.remove('visible'); repairBtn.setAttribute('aria-hidden', 'true'); }
+    }
+
+    function shatter(card) {
+      if (!card) return;
+      if (card.classList.contains('shattered')) return;
+      card.classList.add('shattered');
+      // 短暂抖动
+      card.classList.add('aero-shake');
+      setTimeout(() => card.classList.remove('aero-shake'), 700);
+      showRepair(true);
+    }
+
+    function repairAll() {
+      document.querySelectorAll('.aero-card.shattered').forEach(c => c.classList.remove('shattered'));
+      showRepair(false);
+    }
+
+    cards.forEach(card => {
+      card.addEventListener('pointerdown', e => {
+        // 只有左键/触控计数
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        const cnt = incrementClick(card);
+        if (cnt >= 5) {
+          shatter(card);
+          resetCount(card);
+        }
+      });
+    });
+
+    if (repairBtn) {
+      repairBtn.addEventListener('click', repairAll);
+      // 隐藏初始状态
+      showRepair(false);
+    }
   })();
 </script>
 
