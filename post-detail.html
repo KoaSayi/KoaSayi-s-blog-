@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="gb2312" />
+  <meta charset="GB18030" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>���׵��� �� KoaSayi</title>
+  <title>离谱的事 — KoaSayi</title>
   <style>
-    /* ���� liquid glass��������������ʽ */
+    /* 简洁的 liquid glass（流动玻璃）样式 */
     :root{
       --bg:#0f1724;
       --glass-bg: rgba(255,255,255,0.06);
@@ -31,7 +31,7 @@
       backdrop-filter: blur(8px) saturate(120%);
     }
 
-    /* �����Ĳ�ɫ��� */
+    /* 流动的彩色光斑 */
     .blob{
       position:absolute;filter:blur(36px);opacity:0.9;mix-blend-mode:screen;border-radius:50%;
       animation: float 8s ease-in-out infinite;
@@ -50,15 +50,15 @@
 
     .back{display:inline-block;margin-top:18px;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--accent);text-decoration:none}
 
-    /* ��Ӧ */
+    /* 响应 */
     @media (max-width:600px){.wrap{margin:18px;padding:16px} .blob{display:none}}
   </style>
 </head>
 <body>
   <div class="wrap">
     <nav class="nav">
-      <a href="index.html">�� ������ҳ</a>
-      <a href="#comments">����</a>
+      <a href="index.html">← 返回首页</a>
+      <a href="#comments">评论</a>
     </nav>
 
     <section class="page-hero">
@@ -68,27 +68,28 @@
 
       <div class="glass-card">
         <header>
-          <h1>���׵��¡�</h1>
-          <p class="meta">2025-12-11 �� ���ࣺKoa��ʵSayi �� �Ķ���3 ����</p>
+          <h1>离谱的事。</h1>
+          <p class="meta">2025-12-11 · 分类：Koa现实Sayi · 阅读：3 分钟</p>
         </header>
 
         <article>
-          <p>����һƪʾ�����£�չʾ "liquid glass" ��������ҳ�档ҳ��ͨ���ϵ͵Ĳ�͸���������߿�� backdrop-filter ��ģ��Ч��Ӫ���͸�������У��ٸ��������Ĳ�ɫ��ߣ�blob��������Һ̬�������Ӿ�Ч����</p>
+          <p>这是一篇示范文章，展示 "liquid glass" 风格的文章页面。页面通过较低的不透明背景、边框和 backdrop-filter 的模糊效果营造半透明玻璃感，再辅以流动的彩色光斑（blob），产生液态玻璃的视觉效果。</p>
 
-          <p>������ڴ˴�д���������ݣ�������䡢����Ƭ�Ρ�ͼ������á��·�Ϊʾ��С�ڣ���ʾ�Ű�����ʽ����ڲ�����Ƭ�ڳ��֡�</p>
+          <p>你可以在此处写更长的内容，例如段落、代码片段、图像或引用。下方为示例小节，演示排版与样式如何在玻璃卡片内呈现。</p>
 
-          <h2>һ��С����</h2>
-          <p>����ʾ�����ڿ����������Ŀʱ����ע��ɷ����ԣ��������ֶԱȡ�������ʽ�������ܣ�����ʹ�� backdrop-filter ����Ӱ��Ͷ��豸����</p>
+          <h2>一个小标题</h2>
+          <p>内容示例：在开发或设计项目时，请注意可访问性（例如文字对比、焦点样式）与性能（过度使用 backdrop-filter 可能影响低端设备）。</p>
 
-          <blockquote style="margin:18px 0;padding:12px;border-left:3px solid rgba(255,255,255,0.06);color:#cfe9ff">�����뼴���ԣ���Ƽ�̬�ȡ���</blockquote>
+          <blockquote style="margin:18px 0;padding:12px;border-left:3px solid rgba(255,255,255,0.06);color:#cfe9ff">“代码即语言，设计即态度。”</blockquote>
 
-          <p>�����������������չ���ܣ����԰���ʽ��ȡ�� `styles.css`�������Ķ�����������ɫ/ǳɫ�����л�����֧�ֻ�������ϵͳ��</p>
+          <p>结束语：如果你想继续拓展功能，可以把样式提取到 `styles.css`，添加阅读进度条、深色/浅色主题切换，或支持互动评论系统。</p>
 
-          <a class="back" href="index.html">�ص���ҳ</a>
+          <a class="back" href="index.html">回到首页</a>
         </article>
       </div>
     </section>
 
   </div>
 </body>
+
 </html>
