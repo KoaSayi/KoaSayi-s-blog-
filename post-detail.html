@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="gb2312" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>离谱的事 — KoaSayi</title>
+  <style>
+    /* 简洁的 liquid glass（流动玻璃）样式 */
+    :root{
+      --bg:#0f1724;
+      --glass-bg: rgba(255,255,255,0.06);
+      --glass-border: rgba(255,255,255,0.12);
+      --accent: rgba(120,200,255,0.12);
+      color-scheme: dark;
+      color: #e6eef8;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#071025 0%, #081126 40%, #071022 100%);}
+    .wrap{max-width:900px;margin:48px auto;padding:24px;}
+
+    .nav{display:flex;gap:12px;margin-bottom:18px;align-items:center}
+    .nav a{color:var(--accent);text-decoration:none;font-weight:600}
+
+    .page-hero{
+      position:relative;
+      padding:28px;border-radius:16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow: 0 6px 30px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+      overflow:hidden;
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(8px) saturate(120%);
+    }
+
+    /* 流动的彩色光斑 */
+    .blob{
+      position:absolute;filter:blur(36px);opacity:0.9;mix-blend-mode:screen;border-radius:50%;
+      animation: float 8s ease-in-out infinite;
+    }
+    .blob.b1{width:320px;height:320px;left:-80px;top:-60px;background:linear-gradient(45deg,#6dd3ff,#8a7cff);animation-duration:10s}
+    .blob.b2{width:240px;height:240px;right:-60px;top:40px;background:linear-gradient(45deg,#ffb199,#ff8ab6);animation-duration:12s}
+    .blob.b3{width:180px;height:180px;left:40%;bottom:-60px;background:linear-gradient(45deg,#9affc8,#6ad3ff);animation-duration:14s}
+
+    @keyframes float{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-18px) scale(1.03)}100%{transform:translateY(0) scale(1)}}
+
+    .glass-card{position:relative;padding:28px;border-radius:12px;background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter: blur(10px) saturate(130%);}
+
+    h1{margin:0 0 6px 0;font-size:28px}
+    .meta{color:#9fb1c9;font-size:13px;margin-bottom:16px}
+    article p{line-height:1.75;color:#dcebf9}
+
+    .back{display:inline-block;margin-top:18px;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--accent);text-decoration:none}
+
+    /* 响应 */
+    @media (max-width:600px){.wrap{margin:18px;padding:16px} .blob{display:none}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="nav">
+      <a href="index.html">← 返回首页</a>
+      <a href="#comments">评论</a>
+    </nav>
+
+    <section class="page-hero">
+      <div class="blob b1" aria-hidden="true"></div>
+      <div class="blob b2" aria-hidden="true"></div>
+      <div class="blob b3" aria-hidden="true"></div>
+
+      <div class="glass-card">
+        <header>
+          <h1>离谱的事。</h1>
+          <p class="meta">2025-12-11 · 分类：Koa现实Sayi · 阅读：3 分钟</p>
+        </header>
+
+        <article>
+          <p>这是一篇示范文章，展示 "liquid glass" 风格的文章页面。页面通过较低的不透明背景、边框和 backdrop-filter 的模糊效果营造半透明玻璃感，再辅以流动的彩色光斑（blob），产生液态玻璃的视觉效果。</p>
+
+          <p>你可以在此处写更长的内容，例如段落、代码片段、图像或引用。下方为示例小节，演示排版与样式如何在玻璃卡片内呈现。</p>
+
+          <h2>一个小标题</h2>
+          <p>内容示例：在开发或设计项目时，请注意可访问性（例如文字对比、焦点样式）与性能（过度使用 backdrop-filter 可能影响低端设备）。</p>
+
+          <blockquote style="margin:18px 0;padding:12px;border-left:3px solid rgba(255,255,255,0.06);color:#cfe9ff">“代码即语言，设计即态度。”</blockquote>
+
+          <p>结束语：如果你想继续拓展功能，可以把样式提取到 `styles.css`，添加阅读进度条、深色/浅色主题切换，或支持互动评论系统。</p>
+
+          <a class="back" href="index.html">回到首页</a>
+        </article>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
