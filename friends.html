@@ -5,6 +5,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>KoaSayi-Friends!</title>
+    <script>
+      // apply stored theme early to reduce flash
+      (function(){ try { var s = localStorage.getItem('theme'); if (s) document.documentElement.setAttribute('data-theme', s); else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.setAttribute('data-theme','dark'); } catch(e){} })();
+    </script>
     <link rel="stylesheet" href="styles.css" />
 </head>
 
@@ -139,7 +143,12 @@
                     a.style.backgroundSize = 'cover';
                     a.style.backgroundPosition = 'center';
                     const url = f.url ? escapeHtml(f.url) : '#';
-                    a.innerHTML = `\n                        <img class="friend-avatar" src="${escapeHtml(f.avatar || '')}" alt="${escapeHtml(f.name)}">\n                        <div class="friend-meta">\n                          <h4><a href="${url}" target="_blank" rel="noopener">${escapeHtml(f.name)}</a></h4>\n                          <p>${escapeHtml(f.desc || '')}</p>\n                        </div>`;
+                    a.innerHTML = `
+                        <img class="friend-avatar" src="${escapeHtml(f.avatar || '')}" alt="${escapeHtml(f.name)}">
+                        <div class="friend-meta">
+                          <h4><a href="${url}" target="_blank" rel="noopener">${escapeHtml(f.name)}</a></h4>
+                          <p>${escapeHtml(f.desc || '')}</p>
+                        </div>`;
                     // 绑定点击水波纹，并使整个卡片可点击（跳转到 friend.url）
                     a.style.cursor = 'pointer';
                     a.addEventListener('pointerdown', e => {
@@ -183,6 +192,12 @@
                 const card = el.closest && el.closest('.friend-card');
                 // 如果没有命中 card，则清理上一个被 hover 的 card 并返回
                 if (!card) {
+                    if (lastCard) clearCard(lastCard);
+                    lastCard = null;
+                    return;
+                }
+                // 防御：确保 card 有 getBoundingClientRect
+                if (typeof card.getBoundingClientRect !== 'function') {
                     if (lastCard) clearCard(lastCard);
                     lastCard = null;
                     return;

@@ -1,11 +1,10 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="GB18030" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ç¦»è°±çš„äº‹ â€” KoaSayi</title>
+  <title>ÎÄÕÂÏêÇé ¡¤ KoaSayi</title>
   <style>
-    /* ç®€æ´çš„ liquid glassï¼ˆæµåŠ¨ç»ç’ƒï¼‰æ ·å¼ */
     :root{
       --bg:#0f1724;
       --glass-bg: rgba(255,255,255,0.06);
@@ -13,7 +12,7 @@
       --accent: rgba(120,200,255,0.12);
       color-scheme: dark;
       color: #e6eef8;
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, "Noto Sans SC";
     }
     html,body{height:100%;margin:0;background:linear-gradient(180deg,#071025 0%, #081126 40%, #071022 100%);}
     .wrap{max-width:900px;margin:48px auto;padding:24px;}
@@ -31,7 +30,6 @@
       backdrop-filter: blur(8px) saturate(120%);
     }
 
-    /* æµåŠ¨çš„å½©è‰²å…‰æ–‘ */
     .blob{
       position:absolute;filter:blur(36px);opacity:0.9;mix-blend-mode:screen;border-radius:50%;
       animation: float 8s ease-in-out infinite;
@@ -50,15 +48,14 @@
 
     .back{display:inline-block;margin-top:18px;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--accent);text-decoration:none}
 
-    /* å“åº” */
     @media (max-width:600px){.wrap{margin:18px;padding:16px} .blob{display:none}}
   </style>
 </head>
 <body>
   <div class="wrap">
     <nav class="nav">
-      <a href="index.html">â† è¿”å›é¦–é¡µ</a>
-      <a href="#comments">è¯„è®º</a>
+      <a href="index.html">·µ»ØÖ÷Ò³</a>
+      <a href="#comments">ÆÀÂÛ</a>
     </nav>
 
     <section class="page-hero">
@@ -68,28 +65,27 @@
 
       <div class="glass-card">
         <header>
-          <h1>ç¦»è°±çš„äº‹ã€‚</h1>
-          <p class="meta">2025-12-11 Â· åˆ†ç±»ï¼šKoaç°å®Sayi Â· é˜…è¯»ï¼š3 åˆ†é’Ÿ</p>
+          <h1>ÒºÌ¬²£Á§Ê¾Àı</h1>
+          <p class="meta">2025-12-11 ¡¤ ×÷Õß£ºKoaSayi ¡¤ ·ÖÀà£ºÑİÊ¾</p>
         </header>
 
         <article>
-          <p>è¿™æ˜¯ä¸€ç¯‡ç¤ºèŒƒæ–‡ç« ï¼Œå±•ç¤º "liquid glass" é£æ ¼çš„æ–‡ç« é¡µé¢ã€‚é¡µé¢é€šè¿‡è¾ƒä½çš„ä¸é€æ˜èƒŒæ™¯ã€è¾¹æ¡†å’Œ backdrop-filter çš„æ¨¡ç³Šæ•ˆæœè¥é€ åŠé€æ˜ç»ç’ƒæ„Ÿï¼Œå†è¾…ä»¥æµåŠ¨çš„å½©è‰²å…‰æ–‘ï¼ˆblobï¼‰ï¼Œäº§ç”Ÿæ¶²æ€ç»ç’ƒçš„è§†è§‰æ•ˆæœã€‚</p>
+          <p>±¾Ò³ÃæÊ¾ÀıÎª¡°liquid glass¡±ÊÓ¾õĞ§¹ûµÄÊµÏÖ£¬Ê¹ÓÃÍ¸Ã÷±³¾°¡¢±ß¿òºÍ backdrop-filter À´ÓªÔì²£Á§ÖÊ¸Ğ£¬²¢ÓÃ½¥±äÉ«µÄ Blob ÔªËØÔö¼Ó²ã´Î¸Ğ¡£</p>
 
-          <p>ä½ å¯ä»¥åœ¨æ­¤å¤„å†™æ›´é•¿çš„å†…å®¹ï¼Œä¾‹å¦‚æ®µè½ã€ä»£ç ç‰‡æ®µã€å›¾åƒæˆ–å¼•ç”¨ã€‚ä¸‹æ–¹ä¸ºç¤ºä¾‹å°èŠ‚ï¼Œæ¼”ç¤ºæ’ç‰ˆä¸æ ·å¼å¦‚ä½•åœ¨ç»ç’ƒå¡ç‰‡å†…å‘ˆç°ã€‚</p>
+          <p>Ò³ÃæÖĞÊ¹ÓÃµÄÔªËØÍ¨¹ı CSS ¿ØÖÆÊÓ¾õĞ§¹ûÓëĞÔÄÜÕÛÖÔ£º±ÜÃâ¹ı¶àµÄ°ëÍ¸Ã÷Í¼²ãºÍ¹ı¶ÈµÄÄ£ºı¿ÉÒÔÌáÉıĞÔÄÜ£¬ÓÈÆäÔÚÈõÉè±¸ÉÏ¡£</p>
 
-          <h2>ä¸€ä¸ªå°æ ‡é¢˜</h2>
-          <p>å†…å®¹ç¤ºä¾‹ï¼šåœ¨å¼€å‘æˆ–è®¾è®¡é¡¹ç›®æ—¶ï¼Œè¯·æ³¨æ„å¯è®¿é—®æ€§ï¼ˆä¾‹å¦‚æ–‡å­—å¯¹æ¯”ã€ç„¦ç‚¹æ ·å¼ï¼‰ä¸æ€§èƒ½ï¼ˆè¿‡åº¦ä½¿ç”¨ backdrop-filter å¯èƒ½å½±å“ä½ç«¯è®¾å¤‡ï¼‰ã€‚</p>
+          <h2>×¢ÒâÊÂÏî</h2>
+          <p>Ê¹ÓÃ backdrop-filter Ê±Ó¦ÁôÒâ¼æÈİĞÔ£»¶Ô²»Ö§³ÖµÄä¯ÀÀÆ÷Ìá¹©½µ¼¶ÑùÊ½£¬»òÊ¹ÓÃ½ÏµÍµÄÄ£ºıÖµÒÔ¼õÉÙĞÔÄÜ¿ªÏú¡£</p>
 
-          <blockquote style="margin:18px 0;padding:12px;border-left:3px solid rgba(255,255,255,0.06);color:#cfe9ff">â€œä»£ç å³è¯­è¨€ï¼Œè®¾è®¡å³æ€åº¦ã€‚â€</blockquote>
+          <blockquote style="margin:18px 0;padding:12px;border-left:3px solid rgba(255,255,255,0.06);color:#cfe9ff">ÊÓ¾õĞ§¹û¼Ñµ«ĞèÈ¨ºâĞÔÄÜÓë¼æÈİĞÔ¡£</blockquote>
 
-          <p>ç»“æŸè¯­ï¼šå¦‚æœä½ æƒ³ç»§ç»­æ‹“å±•åŠŸèƒ½ï¼Œå¯ä»¥æŠŠæ ·å¼æå–åˆ° `styles.css`ï¼Œæ·»åŠ é˜…è¯»è¿›åº¦æ¡ã€æ·±è‰²/æµ…è‰²ä¸»é¢˜åˆ‡æ¢ï¼Œæˆ–æ”¯æŒäº’åŠ¨è¯„è®ºç³»ç»Ÿã€‚</p>
+          <p>ÍÆ¼ö½«Í¨ÓÃÑùÊ½³éÀëµ½ `styles.css` ²¢ÔÚÕ¾µãÆäËûÒ³Ãæ¸´ÓÃ£¬¼õÉÙÖØ¸´²¢·½±ãÎ¬»¤¡£</p>
 
-          <a class="back" href="index.html">å›åˆ°é¦–é¡µ</a>
+          <a class="back" href="index.html">»Øµ½Ê×Ò³</a>
         </article>
       </div>
     </section>
 
   </div>
 </body>
-
 </html>

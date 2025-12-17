@@ -5,6 +5,16 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>KoaSayi</title>
+  <script>
+    // Apply stored theme early to prevent flash of incorrect theme
+    (function(){
+      try {
+        var s = localStorage.getItem('theme');
+        if (s) document.documentElement.setAttribute('data-theme', s);
+        else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.setAttribute('data-theme','dark');
+      } catch (e) { /* ignore */ }
+    })();
+  </script>
   <link rel="stylesheet" href="styles.css" />
 </head>
 
@@ -32,9 +42,7 @@
         <h2 class="post-title">此网页还在开发中！</h2>
         <p class="post-meta">2025-12-04 · 分类：- · 阅读：- 分钟</p>
         <p>正在重拾自己的博客计划。
-          目前打算想办法把之前写的一些文章整理出来，放到这个博客上..
-          等开发好后买一个域名然后部署上去..吗?
-        </p>
+          目前打算想办法把之前写的一些文章整理出来，放到这个博客上..</p>
         <p><a class="read-more" href="#">阅读更多 →</a></p>
       </article>
 
@@ -55,7 +63,7 @@
 
       <div class="card">
         <h3>contact</h3>
-        <p>邮箱：hdb97028@gmail.com</p>
+        <p>邮箱：<a href="mailto:hdb97028@gmail.com">hdb97028@gmail.com</a></p>
       </div>
 
       <!-- 四个 Windows Aero 风格的方块 -->
@@ -89,246 +97,226 @@
   <!-- 修复玻璃按钮（默认隐藏） -->
   <button id="repair-btn" aria-hidden="true">一键修复</button>
 
-</body>
+  <script>
+    (function () {
+      const doc = document.documentElement;
+      const toggle = document.getElementById('theme-toggle');
+      const repairBtn = document.getElementById('repair-btn');
+      const clickState = new WeakMap();
 
-<script>
-  (function () {
-    const toggle = document.getElementById('theme-toggle');
-    const doc = document.documentElement;
-    const stored = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    // 初始化主题
-    if (stored === 'dark' || (!stored && prefersDark)) doc.setAttribute('data-theme', 'dark');
-    else doc.setAttribute('data-theme', 'light');
+      // Utilities
+      const $ = (sel, ctx = document) => ctx.querySelector(sel);
+      const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
-    function updateIcon() {
-      const isDark = doc.getAttribute('data-theme') === 'dark';
-      if (toggle) toggle.textContent = isDark ? '我怕暗' : '我怕亮';
-    }
+      function safeSetTheme(theme) {
+        if (!theme) return;
+        doc.setAttribute('data-theme', theme);
+        try { localStorage.setItem('theme', theme); } catch (e) { /* ignore */ }
+      }
 
-    if (toggle) {
-      toggle.addEventListener('click', () => {
+      // Theme init
+      const stored = (function () { try { return localStorage.getItem('theme'); } catch (e) { return null; } })();
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      safeSetTheme(stored === 'dark' || (!stored && prefersDark) ? 'dark' : 'light');
+
+      function updateIcon() {
         const isDark = doc.getAttribute('data-theme') === 'dark';
-        const next = isDark ? 'light' : 'dark';
-        doc.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
-        updateIcon();
-      });
-    }
+        if (toggle) toggle.textContent = isDark ? '我怕暗' : '我怕亮';
+      }
 
-    if (window.matchMedia) {
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        const storedNow = localStorage.getItem('theme');
-        if (!storedNow) {
-          doc.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+      if (toggle) {
+        toggle.addEventListener('click', () => {
+          const isDark = doc.getAttribute('data-theme') === 'dark';
+          const next = isDark ? 'light' : 'dark';
+          safeSetTheme(next);
           updateIcon();
-        }
-      });
-    }
-
-    updateIcon();
-  })();
-</script>
-
-<script>
-  (function () {
-    // 玻璃碎裂与修复逻辑（首页 aero-card）
-    const repairBtn = document.getElementById('repair-btn');
-    const clickState = new WeakMap();
-
-    // 如果页面中还有传统的 .card 元素（比如 sidebar），将它们替换为 .aero-card，放入 .aero-grid
-    (function convertSidebarCards() {
-      const aside = document.querySelector('.sidebar');
-      if (!aside) return;
-      const existingGrid = aside.querySelector('.aero-grid');
-      const cards = Array.from(aside.querySelectorAll('.card'));
-      if (cards.length === 0) return;
-      // 如果已有 aero-grid，直接把 .card 转为 .aero-card 并 append
-      let grid = existingGrid;
-      if (!grid) {
-        grid = document.createElement('div');
-        grid.className = 'aero-grid';
-        aside.appendChild(grid);
+        });
       }
-      cards.forEach(c => {
-        c.classList.remove('card');
-        c.classList.add('aero-card');
-        grid.appendChild(c);
-      });
+
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+          try {
+            if (!localStorage.getItem('theme')) {
+              safeSetTheme(e.matches ? 'dark' : 'light');
+              updateIcon();
+            }
+          } catch (err) { /* ignore */ }
+        });
+      }
+
+      updateIcon();
+
+      // ---------- Aero shatter logic ----------
+      function resetCount(card) {
+        const s = clickState.get(card) || { count: 0, timer: null };
+        s.count = 0;
+        if (s.timer) { clearTimeout(s.timer); s.timer = null; }
+        clickState.set(card, s);
+      }
+
+      function incrementClick(card) {
+        const s = clickState.get(card) || { count: 0, timer: null };
+        s.count += 1;
+        if (s.timer) clearTimeout(s.timer);
+        s.timer = setTimeout(() => { s.count = 0; s.timer = null; clickState.set(card, s); }, 1200);
+        clickState.set(card, s);
+        return s.count;
+      }
+
+      function showRepair(yes) {
+        if (!repairBtn) return;
+        repairBtn.classList.toggle('visible', !!yes);
+        repairBtn.setAttribute('aria-hidden', yes ? 'false' : 'true');
+      }
+
+      function generateRandomPolygon() {
+        const points = [];
+        const cx = 45 + Math.random() * 10;
+        const cy = 40 + Math.random() * 20;
+        const count = 4 + Math.floor(Math.random() * 3);
+        for (let i = 0; i < count; i++) {
+          const angle = (Math.PI * 2 / count) * i + (Math.random() - 0.5) * 0.6;
+          const r = 22 + Math.random() * 55;
+          const x = Math.max(0, Math.min(100, cx + Math.cos(angle) * r));
+          const y = Math.max(0, Math.min(100, cy + Math.sin(angle) * r));
+          points.push(`${x}% ${y}%`);
+        }
+        return points;
+      }
+
+      function shatter(card, pointerX, pointerY) {
+        if (!card || card.classList.contains('shattered')) return;
+        card.classList.add('shattered');
+        const rect = card.getBoundingClientRect();
+        const cx = (pointerX !== undefined ? pointerX : (rect.left + rect.width / 2)) - rect.left;
+        const cy = (pointerY !== undefined ? pointerY : (rect.top + rect.height / 2)) - rect.top;
+
+        const overlay = document.createElement('div');
+        overlay.className = 'crack-overlay';
+        overlay.setAttribute('data-crack', card.dataset.crack || '1');
+        overlay.style.pointerEvents = 'none';
+
+        const svgNS = 'http://www.w3.org/2000/svg';
+        const svg = document.createElementNS(svgNS, 'svg');
+        svg.setAttribute('class', 'crack-svg');
+        svg.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
+        svg.setAttribute('preserveAspectRatio', 'none');
+
+        const lines = 8 + Math.floor(Math.random() * 6);
+        for (let i = 0; i < lines; i++) {
+          const angle = (Math.PI * 2 / lines) * i + (Math.random() - 0.5) * 0.6;
+          const len = Math.max(rect.width, rect.height) * (0.25 + Math.random() * 0.9);
+          const x2 = cx + Math.cos(angle) * len;
+          const y2 = cy + Math.sin(angle) * len;
+          const path = document.createElementNS(svgNS, 'path');
+          path.setAttribute('d', `M ${cx} ${cy} Q ${(cx + x2) / 2 + (Math.random()-0.5)*30} ${(cy + y2) / 2 + (Math.random()-0.5)*30}, ${x2} ${y2}`);
+          path.setAttribute('stroke', 'rgba(255,255,255,0.18)');
+          path.setAttribute('stroke-width', (Math.random() * 1.2 + 0.6).toString());
+          path.setAttribute('fill', 'none');
+          path.setAttribute('stroke-linecap', 'round');
+          path.setAttribute('class', 'crack-line');
+          svg.appendChild(path);
+        }
+
+        const impact = document.createElement('div');
+        impact.className = 'impact-spot';
+        impact.style.left = `${cx - 18}px`;
+        impact.style.top = `${cy - 18}px`;
+
+        overlay.appendChild(svg);
+        overlay.appendChild(impact);
+        card.appendChild(overlay);
+
+        const shardCount = 7 + Math.floor(Math.random() * 6);
+        for (let i = 0; i < shardCount; i++) {
+          const shard = document.createElement('div');
+          shard.className = 'shard';
+          const poly = generateRandomPolygon();
+          shard.style.clipPath = `polygon(${poly.join(',')})`;
+          shard.style.left = '0';
+          shard.style.top = '0';
+          const dirX = (Math.random() - 0.5) * 2;
+          const dirY = (Math.random() - 0.3) * -1.4;
+          const distance = 40 + Math.random() * 160;
+          const tx = Math.round(dirX * distance) + 'px';
+          const ty = Math.round(dirY * distance) + 'px';
+          const rot = Math.round((Math.random() - 0.5) * 720) + 'deg';
+          const dur = (900 + Math.random() * 900) + 'ms';
+          const delay = Math.round(Math.random() * 140) + 'ms';
+          shard.style.setProperty('--tx', tx);
+          shard.style.setProperty('--ty', ty);
+          shard.style.setProperty('--rot', rot);
+          shard.style.animation = `shardFly ${dur} ${Math.random() < 0.5 ? 'cubic-bezier(.2,.8,.2,1)' : 'cubic-bezier(.25,.8,.25,1)'} ${delay} forwards`;
+
+          overlay.appendChild(shard);
+        }
+
+        card.classList.add('aero-shake');
+        setTimeout(() => card.classList.remove('aero-shake'), 700);
+
+        card._crackOverlay = overlay;
+        showRepair(true);
+      }
+
+      function repairAll() {
+        $$('.aero-card.shattered').forEach(c => {
+          c.classList.remove('shattered');
+          if (c._crackOverlay) {
+            c._crackOverlay.style.transition = 'opacity .35s ease';
+            c._crackOverlay.style.opacity = '0';
+            setTimeout(() => { if (c._crackOverlay && c._crackOverlay.parentNode) c._crackOverlay.parentNode.removeChild(c._crackOverlay); c._crackOverlay = null; }, 380);
+          }
+        });
+        showRepair(false);
+      }
+
+      function bindShatterHandlers() {
+        const cards = $$('.aero-card');
+        cards.forEach(card => {
+          const onPointerDown = e => {
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            const cnt = incrementClick(card);
+            if (cnt >= 5) { shatter(card, e.clientX, e.clientY); resetCount(card); }
+          };
+          const onClick = e => {
+            if (e.button && e.button !== 0) return;
+            const cnt = incrementClick(card);
+            if (cnt >= 5) { shatter(card, e.clientX, e.clientY); resetCount(card); }
+          };
+          card.addEventListener('pointerdown', onPointerDown);
+          card.addEventListener('click', onClick);
+        });
+      }
+
+      // Convert .card elements inside sidebar to .aero-card for consistent behavior
+      (function convertSidebarCards() {
+        const aside = $('.sidebar');
+        if (!aside) return;
+        const existingGrid = $('.aero-grid', aside);
+        const cards = $$('.card', aside);
+        if (cards.length === 0) return;
+        let grid = existingGrid;
+        if (!grid) {
+          grid = document.createElement('div');
+          grid.className = 'aero-grid';
+          aside.appendChild(grid);
+        }
+        cards.forEach(c => {
+          c.classList.remove('card');
+          c.classList.add('aero-card');
+          grid.appendChild(c);
+        });
+      })();
+
+      bindShatterHandlers();
+
+      if (repairBtn) {
+        repairBtn.addEventListener('click', repairAll);
+        showRepair(false);
+      }
+
     })();
-
-    function resetCount(card) {
-      const s = clickState.get(card) || { count: 0, timer: null };
-      s.count = 0;
-      if (s.timer) { clearTimeout(s.timer); s.timer = null; }
-      clickState.set(card, s);
-    }
-
-    function incrementClick(card) {
-      const s = clickState.get(card) || { count: 0, timer: null };
-      s.count += 1;
-      if (s.timer) clearTimeout(s.timer);
-      // 若 1.2s 内无新点击则重置计数
-      s.timer = setTimeout(() => { s.count = 0; s.timer = null; clickState.set(card, s); }, 1200);
-      clickState.set(card, s);
-      return s.count;
-    }
-
-    function showRepair(yes) {
-      if (!repairBtn) return;
-      if (yes) { repairBtn.classList.add('visible'); repairBtn.setAttribute('aria-hidden', 'false'); }
-      else { repairBtn.classList.remove('visible'); repairBtn.setAttribute('aria-hidden', 'true'); }
-    }
-
-    // Enhanced shatter: create crack overlay + multiple animated shards
-    function shatter(card, pointerX, pointerY) {
-      if (!card) return;
-      if (card.classList.contains('shattered')) return;
-
-      card.classList.add('shattered');
-
-      // impact point relative to card
-      const rect = card.getBoundingClientRect();
-      const cx = (pointerX !== undefined ? pointerX : (rect.left + rect.width / 2)) - rect.left;
-      const cy = (pointerY !== undefined ? pointerY : (rect.top + rect.height / 2)) - rect.top;
-
-      // create overlay container
-      const overlay = document.createElement('div');
-      overlay.className = 'crack-overlay';
-      overlay.setAttribute('data-crack', card.dataset.crack || '1');
-      overlay.style.pointerEvents = 'none';
-
-      // add SVG cracks for fine lines
-      const svgNS = 'http://www.w3.org/2000/svg';
-      const svg = document.createElementNS(svgNS, 'svg');
-      svg.setAttribute('class', 'crack-svg');
-      svg.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
-      svg.setAttribute('preserveAspectRatio', 'none');
-
-      // generate multiple radiating crack paths
-      const lines = 8 + Math.floor(Math.random() * 6);
-      for (let i = 0; i < lines; i++) {
-        const angle = (Math.PI * 2 / lines) * i + (Math.random() - 0.5) * 0.6;
-        const len = Math.max(rect.width, rect.height) * (0.25 + Math.random() * 0.9);
-        const x2 = cx + Math.cos(angle) * len;
-        const y2 = cy + Math.sin(angle) * len;
-        const path = document.createElementNS(svgNS, 'path');
-        path.setAttribute('d', `M ${cx} ${cy} Q ${(cx + x2) / 2 + (Math.random()-0.5)*30} ${(cy + y2) / 2 + (Math.random()-0.5)*30}, ${x2} ${y2}`);
-        path.setAttribute('stroke', 'rgba(255,255,255,0.18)');
-        path.setAttribute('stroke-width', (Math.random() * 1.2 + 0.6).toString());
-        path.setAttribute('fill', 'none');
-        path.setAttribute('stroke-linecap', 'round');
-        path.setAttribute('class', 'crack-line');
-        svg.appendChild(path);
-      }
-
-      // impact highlight
-      const impact = document.createElement('div');
-      impact.className = 'impact-spot';
-      impact.style.left = `${cx - 18}px`;
-      impact.style.top = `${cy - 18}px`;
-
-      overlay.appendChild(svg);
-      overlay.appendChild(impact);
-      card.appendChild(overlay);
-
-      // create shards
-      const shardCount = 7 + Math.floor(Math.random() * 6);
-      for (let i = 0; i < shardCount; i++) {
-        const shard = document.createElement('div');
-        shard.className = 'shard';
-        // random clip-path polygon to simulate irregular piece
-        const poly = generateRandomPolygon();
-        shard.style.clipPath = `polygon(${poly.join(',')})`;
-        // starting position: no translate
-        shard.style.left = '0';
-        shard.style.top = '0';
-        // random translation direction away from impact
-        const dirX = (Math.random() - 0.5) * 2;
-        const dirY = (Math.random() - 0.3) * -1.4; // bias upward
-        const distance = 40 + Math.random() * 160;
-        const tx = Math.round(dirX * distance) + 'px';
-        const ty = Math.round(dirY * distance) + 'px';
-        const rot = Math.round((Math.random() - 0.5) * 720) + 'deg';
-        const dur = (900 + Math.random() * 900) + 'ms';
-        const delay = Math.round(Math.random() * 140) + 'ms';
-        shard.style.setProperty('--tx', tx);
-        shard.style.setProperty('--ty', ty);
-        shard.style.setProperty('--rot', rot);
-        shard.style.animation = `shardFly ${dur} ${Math.random() < 0.5 ? 'cubic-bezier(.2,.8,.2,1)' : 'cubic-bezier(.25,.8,.25,1)'} ${delay} forwards`;
-
-        overlay.appendChild(shard);
-      }
-
-      // small camera shake on card
-      card.classList.add('aero-shake');
-      setTimeout(() => card.classList.remove('aero-shake'), 700);
-
-      // store overlay reference for repair
-      card._crackOverlay = overlay;
-
-      showRepair(true);
-    }
-
-    function generateRandomPolygon() {
-      // produce a polygon in percent values that covers a random area
-      const points = [];
-      const cx = 45 + Math.random() * 10; // center x percent
-      const cy = 40 + Math.random() * 20; // center y percent
-      const count = 4 + Math.floor(Math.random() * 3);
-      for (let i = 0; i < count; i++) {
-        const angle = (Math.PI * 2 / count) * i + (Math.random() - 0.5) * 0.6;
-        const r = 22 + Math.random() * 55; // radius in percent roughly
-        const x = Math.max(0, Math.min(100, cx + Math.cos(angle) * r));
-        const y = Math.max(0, Math.min(100, cy + Math.sin(angle) * r));
-        points.push(`${x}% ${y}%`);
-      }
-      return points;
-    }
-
-    function repairAll() {
-      document.querySelectorAll('.aero-card.shattered').forEach(c => {
-        c.classList.remove('shattered');
-        // remove overlay if any
-        if (c._crackOverlay) {
-          // fade out overlay then remove
-          c._crackOverlay.style.transition = 'opacity .35s ease';
-          c._crackOverlay.style.opacity = '0';
-          setTimeout(() => { if (c._crackOverlay && c._crackOverlay.parentNode) c._crackOverlay.parentNode.removeChild(c._crackOverlay); c._crackOverlay = null; }, 380);
-        }
-      });
-      showRepair(false);
-    }
-
-    // 绑定事件：支持 pointerdown 且在不支持 pointer 的环境下回退到 click
-    function bindShatterHandlers() {
-      const cards = document.querySelectorAll('.aero-card');
-      cards.forEach(card => {
-        // pointerdown handler
-        card.addEventListener('pointerdown', e => {
-          // 只有左键/触控计数
-          if (e.pointerType === 'mouse' && e.button !== 0) return;
-          const cnt = incrementClick(card);
-          if (cnt >= 5) { shatter(card, e.clientX, e.clientY); resetCount(card); }
-        });
-        // click fallback for environments not firing pointerdown consistently
-        card.addEventListener('click', e => {
-          // ignore non-primary buttons
-          if (e.button && e.button !== 0) return;
-          const cnt = incrementClick(card);
-          if (cnt >= 5) { shatter(card, e.clientX, e.clientY); resetCount(card); }
-        });
-      });
-    }
-
-    bindShatterHandlers();
-
-    if (repairBtn) {
-      repairBtn.addEventListener('click', repairAll);
-      // 隐藏初始状态
-      showRepair(false);
-    }
-  })();
-</script>
+  </script>
+</body>
 
 </html>
