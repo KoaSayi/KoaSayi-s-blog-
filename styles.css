@@ -1,6 +1,6 @@
 /* 简洁博客样式 */
 :root {
-  --bg: #f7f7f9;
+  --bg: #ffffff;
   --card: #ffffff;
   --text: #222;
   --muted: #6b7280;
@@ -13,7 +13,7 @@
 
 /* 简洁博客样式（已扩展：深色模式支持） */
 :root {
-  --bg: #f7f7f9;
+  --bg: #ffffff;
   --card: #ffffff;
   --text: #222222;
   --muted: #6b7280;
@@ -40,15 +40,10 @@ body {
 
 body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
-  /* 站点默认背景色 + 全局背景图（Windows Vista 风格） */
+  /* 站点默认背景色：亮色模式使用纯色背景（不加载背景图） */
   background-color: var(--bg);
   color: var(--text);
-  /* Light-mode background image */
-  background-image: url('image/Background/windows_vista_49.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  background-image: none;
   margin: 0;
   line-height: 1.6;
   transition: background-color 240ms ease, color 240ms ease;
@@ -695,9 +690,67 @@ body {
 #repair-btn{position:fixed;right:18px;bottom:18px;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);color:#cfe9ff;cursor:pointer;transition:opacity .2s ease,transform .12s ease;opacity:0;pointer-events:none}
 #repair-btn.visible{opacity:1;pointer-events:auto;transform:translateY(0)}
 
-/* small responsive tweaks */
-@media (max-width:600px){
-    .aero-card {
-        padding: 12px;
-        border-radius: 10px
-    }}
+/* Preload overlay (index.html only) */
+#preload-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.0);
+  z-index: 9999;
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+  transition: opacity 420ms ease, visibility 420ms ease;
+  /* start hidden; shown when .visible class is added */
+  opacity: 0;
+  visibility: hidden;
+}
+
+#preload-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+#preload-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+#preload-overlay .pre-title {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--text);
+  will-change: transform, opacity;
+  transition: transform 520ms cubic-bezier(.2,.9,.2,1), opacity 420ms ease;
+  position: relative;
+  z-index: 10001;
+}
+
+/* hide site title while preloading so the moving title effect is seamless */
+body.preloading .site-title {
+  visibility: hidden;
+}
+
+/* progress bar bottom-left */
+#preload-overlay .progress-wrap {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  width: 220px;
+  height: 8px;
+  background: rgba(0,0,0,0.06);
+  border-radius: 6px;
+  overflow: hidden;
+  z-index: 10002;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+#preload-overlay .progress {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg,var(--accent),#4f46e5);
+  transition: width 240ms linear;
+}

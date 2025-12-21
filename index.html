@@ -18,7 +18,13 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 
-<body>
+<body class="preloading">
+  <!-- Preload overlay (index only) -->
+  <div id="preload-overlay" aria-hidden="false">
+    <div class="pre-title">KoaSayi</div>
+    <div class="progress-wrap"><div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div>
+  </div>
+
   <header class="site-header">
     <div class="wrap">
       <h1 class="site-title">KoaSayi</h1>
@@ -185,17 +191,35 @@
       }
 
       function shatter(card, pointerX, pointerY) {
-        if (!card || card.classList.contains('shattered')) return;
+        if (!card) return;
+        // allow multiple shatters: keep an array of overlays per card
+        const maxOverlays = 4;
         card.classList.add('shattered');
         const rect = card.getBoundingClientRect();
         const cx = (pointerX !== undefined ? pointerX : (rect.left + rect.width / 2)) - rect.left;
         const cy = (pointerY !== undefined ? pointerY : (rect.top + rect.height / 2)) - rect.top;
 
+        // manage overlays array
+        const overlays = card._crackOverlays || [];
+        if (overlays.length >= maxOverlays) {
+          // fade out and remove the oldest overlay to make room
+          const old = overlays.shift();
+          if (old) {
+            old.style.transition = 'opacity .35s ease';
+            old.style.opacity = '0';
+            setTimeout(() => { try { old.parentNode && old.parentNode.removeChild(old); } catch (e) {} }, 380);
+          }
+        }
+
+        // create overlay container
         const overlay = document.createElement('div');
         overlay.className = 'crack-overlay';
-        overlay.setAttribute('data-crack', card.dataset.crack || '1');
+        // use overlay index as data-crack for variety
+        const nextIndex = (overlays.length % 3) + 1;
+        overlay.setAttribute('data-crack', card.dataset.crack || String(nextIndex));
         overlay.style.pointerEvents = 'none';
 
+        // add SVG cracks for fine lines
         const svgNS = 'http://www.w3.org/2000/svg';
         const svg = document.createElementNS(svgNS, 'svg');
         svg.setAttribute('class', 'crack-svg');
@@ -227,6 +251,7 @@
         overlay.appendChild(impact);
         card.appendChild(overlay);
 
+        // create shards
         const shardCount = 7 + Math.floor(Math.random() * 6);
         for (let i = 0; i < shardCount; i++) {
           const shard = document.createElement('div');
@@ -251,16 +276,35 @@
           overlay.appendChild(shard);
         }
 
+        // small camera shake on card
         card.classList.add('aero-shake');
         setTimeout(() => card.classList.remove('aero-shake'), 700);
 
+        // store overlays reference for repair; keep compatibility with single _crackOverlay
+        overlays.push(overlay);
+        card._crackOverlays = overlays;
         card._crackOverlay = overlay;
+
         showRepair(true);
       }
 
       function repairAll() {
-        $$('.aero-card.shattered').forEach(c => {
+        document.querySelectorAll('.aero-card.shattered').forEach(c => {
           c.classList.remove('shattered');
+          // remove all overlays if present
+          if (Array.isArray(c._crackOverlays) && c._crackOverlays.length) {
+            c._crackOverlays.forEach(o => {
+              try {
+                o.style.transition = 'opacity .35s ease';
+                o.style.opacity = '0';
+                setTimeout(() => { if (o && o.parentNode) o.parentNode.removeChild(o); }, 380);
+              } catch (e) { /* ignore */ }
+            });
+            c._crackOverlays = [];
+            c._crackOverlay = null;
+            return;
+          }
+          // fallback to previous single overlay field
           if (c._crackOverlay) {
             c._crackOverlay.style.transition = 'opacity .35s ease';
             c._crackOverlay.style.opacity = '0';
@@ -314,6 +358,64 @@
         repairBtn.addEventListener('click', repairAll);
         showRepair(false);
       }
+
+      // ---------- Preload overlay (index only) ----------
+      (function preloadFlow() {
+        try {
+          const overlay = document.getElementById('preload-overlay');
+          if (!overlay) return;
+          const prog = overlay.querySelector('.progress');
+          const title = overlay.querySelector('.pre-title');
+          const headerTitle = document.querySelector('.site-title');
+
+          // show overlay (fade in)
+          overlay.classList.add('visible');
+          // keep header title hidden while preloading
+          document.body.classList.add('preloading');
+
+          let value = 0;
+          const tick = () => {
+            // increase towards 80% while loading
+            if (value < 80) value += 4 + Math.random() * 6;
+            value = Math.min(80, value);
+            prog.style.width = value + '%';
+            prog.setAttribute('aria-valuenow', Math.round(value));
+          };
+          const iv = setInterval(tick, 120);
+
+          // when everything loaded
+          window.addEventListener('load', () => {
+            clearInterval(iv);
+            // finish bar
+            prog.style.width = '100%';
+            prog.setAttribute('aria-valuenow', 100);
+
+            // compute transform to move pre-title into header title position
+            const ptRect = title.getBoundingClientRect();
+            const htRect = headerTitle.getBoundingClientRect();
+
+            const dx = (htRect.left + htRect.width/2) - (ptRect.left + ptRect.width/2);
+            const dy = (htRect.top + htRect.height/2) - (ptRect.top + ptRect.height/2);
+            const scale = Math.min(1, htRect.width / ptRect.width);
+
+            // animate move + shrink
+            title.style.transition = 'transform 560ms cubic-bezier(.2,.9,.2,1), opacity 360ms ease';
+            title.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
+            title.style.opacity = '0.95';
+
+            // wait for the move to finish then fade overlay
+            setTimeout(() => {
+              overlay.classList.add('hidden');
+              // reveal header title
+              document.body.classList.remove('preloading');
+              // cleanup styles after transition
+              setTimeout(() => {
+                try { overlay.parentNode && overlay.parentNode.removeChild(overlay); } catch (e) { }
+              }, 520);
+            }, 620);
+          }, { once: true });
+        } catch (e) { /* ignore */ }
+      })();
 
     })();
   </script>
