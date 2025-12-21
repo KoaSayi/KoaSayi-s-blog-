@@ -747,10 +747,22 @@ body.preloading .site-title {
   overflow: hidden;
   z-index: 10002;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border: 2px solid rgba(255,255,255,0.9); /* white frame */
 }
 #preload-overlay .progress {
   height: 100%;
   width: 0%;
   background: linear-gradient(90deg,var(--accent),#4f46e5);
   transition: width 240ms linear;
+}
+#preload-overlay .progress-label{
+  position: fixed;
+  left: 18px;
+  bottom: 34px;
+  z-index:10003;
+  font-size:13px;
+  color:var(--text);
+  background: rgba(255,255,255,0.02);
+  padding:4px 8px;
+  border-radius:6px;
 }

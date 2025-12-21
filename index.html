@@ -22,6 +22,7 @@
   <!-- Preload overlay (index only) -->
   <div id="preload-overlay" aria-hidden="false">
     <div class="pre-title">KoaSayi</div>
+    <div class="progress-label">Loading</div>
     <div class="progress-wrap"><div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div>
   </div>
 
@@ -365,6 +366,7 @@
           const overlay = document.getElementById('preload-overlay');
           if (!overlay) return;
           const prog = overlay.querySelector('.progress');
+          const label = overlay.querySelector('.progress-label');
           const title = overlay.querySelector('.pre-title');
           const headerTitle = document.querySelector('.site-title');
 
@@ -390,6 +392,9 @@
             prog.style.width = '100%';
             prog.setAttribute('aria-valuenow', 100);
 
+            // set Done! label
+            try { if (label) label.textContent = 'Done!'; } catch (e) {}
+
             // compute transform to move pre-title into header title position
             const ptRect = title.getBoundingClientRect();
             const htRect = headerTitle.getBoundingClientRect();
@@ -412,6 +417,17 @@
               setTimeout(() => {
                 try { overlay.parentNode && overlay.parentNode.removeChild(overlay); } catch (e) { }
               }, 520);
+
+              // after hiding overlay, navigate to homepage if not already on it
+              try {
+                const path = location.pathname || '';
+                const onIndex = /index\.html?$/.test(path) || path === '/';
+                if (!onIndex) {
+                  // small delay so user sees "Done!"
+                  setTimeout(() => { location.href = 'index.html'; }, 320);
+                }
+              } catch (e) { /* ignore */ }
+
             }, 620);
           }, { once: true });
         } catch (e) { /* ignore */ }
