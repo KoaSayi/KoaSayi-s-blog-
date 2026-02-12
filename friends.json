@@ -26,9 +26,10 @@
         "avatar": "https://s2.loli.net/2025/08/05/vW2pnGsJOAd6qEX.jpg",
         "desc": "一介书生,三尺微命。"
     },
-    {
-        "name": "sato_linmao",
-        "url": "https://halo.satolinmao.top:8443/",
-        "desc": "代码是我的魔法，键盘是我的武器，打造属于自己的次元世界！"
-    }
+  {
+    "name": "sato_linmao",
+    "url": "https://halo.satolinmao.top:8443/",
+    "avatar": "/upload/photo_2026-02-12_19-53-38.jpg,"
+    "desc": "网络带宽与追番速度成正比"
+  }
 ]
