@@ -84,8 +84,23 @@
       <a href="#">home</a>
       <a href="friends.html">Friends</a>
       <a href="about.html">about</a>
+      <div class="actions" style="margin-left:12px;">
+        <a class="nav-action" id="nav-home" href="index.html"><span>KoaSayi</span></a>
+        <a class="nav-action" id="nav-furina" href="https://furina64.dpdns.org/openlist" target="_blank" rel="noopener"><span>FurinaFile</span></a>
+        <button class="nav-action" id="nav-search" type="button" aria-label="Search"><span>Search</span></button>
+        <a class="nav-action" id="nav-issues" href="https://github.com/KoaSayi/KoaSayi-s-blog-/issues" target="_blank" rel="noopener"><span>issues</span></a>
+      </div>
     </div>
   </nav>
+
+  <!-- Search overlay -->
+  <div id="search-overlay" aria-hidden="true">
+    <div class="search-bar" role="dialog" aria-label="Search">
+      <input class="search-input" id="search-input" placeholder="输入搜索关键词..." />
+      <div class="search-hint">搜索文章标题中的任意字符</div>
+    </div>
+    <div class="search-results" id="search-results" aria-live="polite"></div>
+  </div>
 
   <main class="wrap main-grid">
     <section class="content">
@@ -100,7 +115,7 @@
 
       <article class="post">
         <h2 class="post-title">正式文章：离谱的事。</h2>
-        <p class="post-meta">2025-12-11 · 分类：Koa现实Sayi-</p>
+        <p class="post-meta" style="">2025-12-11 · 分类：Koa现实Sayi-</p>
         <p>何意味。</p>
         <p><a class="read-more" href="post-detail.html">阅读更多 →</a></p>
       </article>
@@ -197,6 +212,124 @@
       }
 
       updateIcon();
+
+      // ---------- Nav actions (KoaSayi, FurinaFile, Search, issues) ----------
+      const navHome = $('#nav-home');
+      const navFurina = $('#nav-furina');
+      const navSearch = $('#nav-search');
+      const navIssues = $('#nav-issues');
+      const searchOverlay = $('#search-overlay');
+      const searchInput = $('#search-input');
+      const searchResults = $('#search-results');
+
+      if (navHome) navHome.addEventListener('click', e => { e.preventDefault(); location.href = 'index.html'; });
+      if (navFurina) navFurina.addEventListener('click', () => {}); // normal link
+      if (navIssues) navIssues.addEventListener('click', () => {});
+
+      function openSearch() {
+        if (!searchOverlay) return;
+        const bar = searchOverlay.querySelector('.search-bar');
+        searchOverlay.classList.add('visible');
+        if (bar) bar.classList.add('visible');
+        searchOverlay.setAttribute('aria-hidden', 'false');
+        // autofocus
+        setTimeout(() => { try { searchInput && searchInput.focus(); } catch(e){} }, 120);
+      }
+
+      function closeSearch() {
+        if (!searchOverlay) return;
+        // start fade-out
+        const bar = searchOverlay.querySelector('.search-bar');
+        if (bar) bar.classList.remove('visible');
+        searchOverlay.classList.remove('visible');
+        searchOverlay.setAttribute('aria-hidden', 'true');
+        searchResults && searchResults.classList.remove('visible');
+
+        // wait for overlay transition to finish before clearing content so fade-out is visible
+        const onTransitionEnd = (e) => {
+          if (e.target !== searchOverlay || e.propertyName !== 'opacity') return;
+          try { searchResults && (searchResults.innerHTML = ''); } catch (e) {}
+          try { if (searchInput) searchInput.value = ''; } catch (e) {}
+          searchOverlay.removeEventListener('transitionend', onTransitionEnd);
+        };
+        searchOverlay.addEventListener('transitionend', onTransitionEnd);
+      }
+
+      if (navSearch) {
+        navSearch.addEventListener('click', () => { openSearch(); });
+      }
+
+      if (searchOverlay) {
+        searchOverlay.addEventListener('click', e => {
+          if (e.target === searchOverlay) closeSearch();
+        });
+      }
+
+      // search behavior: look for articles on the page whose title contains any character from input
+      function runSearch(q) {
+        const sanitized = String(q || '').trim();
+        searchResults.innerHTML = '';
+        if (!sanitized) return showNoResults();
+
+        // collect unique characters from query (ignore spaces)
+        const chars = Array.from(new Set(sanitized.replace(/\s+/g, '').split('')));
+
+        // find article titles on the page
+        const titles = Array.from(document.querySelectorAll('.post'));
+        const matches = [];
+        titles.forEach(post => {
+          const titleEl = post.querySelector('.post-title');
+          if (!titleEl) return;
+          const titleText = titleEl.textContent || '';
+          // match if any character from query appears in title
+          const matched = chars.some(ch => titleText.indexOf(ch) !== -1);
+          if (matched) {
+            // find a link to the article (read-more) if present
+            const linkEl = post.querySelector('.read-more');
+            const href = linkEl ? linkEl.getAttribute('href') || '#' : '#';
+            matches.push({ title: titleText.trim(), href });
+          }
+        });
+
+        if (matches.length === 0) return showNoResults();
+
+        matches.forEach(m => {
+          const a = document.createElement('a');
+          a.className = 'result-tile';
+          a.href = m.href || '#';
+          a.textContent = m.title;
+          a.addEventListener('click', e => {
+            // let normal navigation happen; close overlay
+            closeSearch();
+          });
+          searchResults.appendChild(a);
+        });
+        searchResults.classList.add('visible');
+      }
+
+      function showNoResults() {
+        searchResults.innerHTML = '';
+        const div = document.createElement('div');
+        div.className = 'no-results';
+        div.textContent = '未找到结果';
+        searchResults.appendChild(div);
+        searchResults.classList.add('visible');
+      }
+
+      if (searchInput) {
+        let typingTimer = null;
+        searchInput.addEventListener('input', e => {
+          clearTimeout(typingTimer);
+          typingTimer = setTimeout(() => runSearch(e.target.value), 220);
+        });
+        searchInput.addEventListener('keydown', e => {
+          if (e.key === 'Escape') closeSearch();
+          if (e.key === 'Enter') runSearch(e.target.value);
+        });
+      }
+
+      // close search with ESC globally
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSearch(); } });
 
       // ---------- Aero shatter logic ----------
       function resetCount(card) {

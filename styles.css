@@ -874,3 +874,199 @@ body[data-theme="light"] {
     font-size: 0.95rem;
   }
 }
+
+/* Navigation extra actions (KoaSayi, FurinaFile, Search, issues) */
+.site-nav .actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-left: 8px;
+}
+
+.site-nav .actions .nav-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  min-height: 40px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.06);
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  overflow: visible;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+  padding-left: 14px;
+  padding-right: 14px;
+}
+
+.site-nav .actions .nav-action:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(2,8,20,0.45);
+}
+
+/* circular glass glow that appears around elements when hovering */
+.site-nav .actions .nav-action::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 140%;
+  height: 140%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.06), rgba(255,255,255,0.03) 20%, transparent 45%);
+  opacity: 0;
+  transition: opacity 180ms ease, transform 220ms ease;
+  z-index: 0;
+}
+.site-nav .actions .nav-action:hover::before,
+.site-nav .actions .nav-action:focus::before {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.02);
+}
+
+.site-nav .actions .nav-action > span {
+  position: relative;
+  z-index: 1;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-transform: none;
+}
+
+/* style nav-action to show plain letters (no icon) */
+.site-nav .actions .nav-action { font-family: inherit; }
+/* Ensure nav-action anchors are not treated as the small circular icon buttons
+   from the earlier `.site-nav a` rules: reset size, text-indent and background. */
+.site-nav .actions .nav-action {
+  width: auto !important;
+  height: auto !important;
+  min-width: 56px;
+  text-indent: 0 !important;
+  background-image: none !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)) !important;
+  border-radius: 999px !important;
+  border-color: rgba(255,255,255,0.06) !important;
+}
+
+/* Also ensure button.nav-action behaves the same */
+.site-nav .actions button.nav-action {
+  appearance: none;
+  border: none;
+  background: none;
+}
+
+/* Search overlay (top-aligned search bar + results box) with fade in/out transitions */
+#search-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column; /* stack bar above results */
+  align-items: center; /* center horizontally */
+  justify-content: flex-start;
+  padding-top: 72px; /* distance from top */
+  z-index: 1400;
+  background: rgba(2,6,23,0.45);
+  backdrop-filter: blur(6px) saturate(120%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 260ms ease, visibility 260ms ease;
+}
+#search-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* horizontal rounded frosted search bar */
+.search-bar {
+  width: 760px;
+  max-width: calc(100% - 64px);
+  height: 56px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.06);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  backdrop-filter: blur(8px) saturate(120%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 14px;
+  box-shadow: 0 12px 40px rgba(2,8,20,0.6);
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 260ms ease, transform 260ms ease;
+}
+
+.search-bar.visible,
+#search-overlay.visible .search-bar {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.search-input {
+  flex: 1 1 auto;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.04);
+  background: rgba(255,255,255,0.02);
+  color: var(--text);
+  font-size: 1rem;
+  outline: none;
+}
+
+.search-hint { margin-left: 12px; color: var(--muted); font-size: 0.9rem }
+
+/* Results box: rectangular frosted panel below the search bar */
+.search-results {
+  margin-top: 12px;
+  width: 760px;
+  max-width: calc(100% - 64px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.06);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+  backdrop-filter: blur(6px) saturate(120%);
+  box-shadow: 0 12px 40px rgba(2,8,20,0.6);
+  max-height: 50vh;
+  overflow: auto;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 260ms ease, transform 260ms ease;
+}
+.search-results.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.search-results .result-tile {
+  padding: 12px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.04);
+  color: var(--text);
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(2,8,20,0.35);
+  display: block;
+}
+
+.no-results {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.04);
+  color: var(--muted);
+}
+
+@media (max-width: 560px) {
+  .search-bar { width: calc(100% - 32px); height: 52px; border-radius: 10px }
+  .search-results, .search-bar { width: calc(100% - 32px) }
