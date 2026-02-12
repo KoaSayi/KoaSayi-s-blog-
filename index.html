@@ -16,6 +16,51 @@
     })();
   </script>
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Liquid glass styling for main article boxes and aero cards */
+    .post, .aero-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 10px 30px rgba(2,8,20,0.6), inset 0 1px rgba(255,255,255,0.02);
+      backdrop-filter: blur(10px) saturate(120%);
+      -webkit-backdrop-filter: blur(10px) saturate(120%);
+      border-radius: 8px;
+      padding: 18px;
+      color: var(--text); /* use theme variable so light-mode gets dark text and dark-mode keeps light text */
+    }
+
+    /* Make anchor-based aero-cards behave like blocks */
+    .aero-card { display: block; text-decoration: none; color: inherit; }
+
+    /* Removed solid black blocks — use transparent backgrounds and inherited text color */
+    .post .post-title,
+    .post .post-meta,
+    .post p,
+    .post .read-more,
+    .aero-card h4,
+    .aero-card p,
+    .card h3,
+    .card p {
+      background: transparent;
+      color: inherit;
+      padding: 6px 10px;
+      border-radius: 6px;
+      line-height: 1.35;
+      display: inline-block;
+    }
+
+    /* Tweak meta and paragraph appearance */
+    .post .post-meta { display: block; margin: 8px 0 12px 0; color: inherit; background: transparent; padding: 6px 10px; }
+    .post p { color: inherit; margin: 0 0 12px 0; display: block; }
+    .post .read-more { color: inherit; background: transparent; padding: 6px 10px; border-radius: 6px; }
+
+    /* Hover lift for visual polish */
+    .post:hover, .aero-card:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(2,8,20,0.65); transition: all .22s ease; }
+
+    @media (max-width: 520px) {
+      .post .post-title, .post .post-meta, .post p { display: block; padding: 8px; }
+    }
+  </style>
 </head>
 
 <body class="preloading">
