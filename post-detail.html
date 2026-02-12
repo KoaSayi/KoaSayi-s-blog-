@@ -1,56 +1,157 @@
 <!doctype html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>如何在VMware中解锁MacOS选项-KoaSayi</title>
   <style>
-    :root{
-      --bg:#0f1724;
-      --glass-bg: rgba(255,255,255,0.06);
-      --glass-border: rgba(255,255,255,0.12);
-      --accent: rgba(120,200,255,0.12);
+    :root {
+      --bg: #0f1724;
+      --glass-bg: rgba(255, 255, 255, 0.06);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --accent: rgba(120, 200, 255, 0.12);
       color-scheme: dark;
       color: #e6eef8;
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, "Noto Sans SC";
     }
-    html,body{height:100%;margin:0;background:linear-gradient(180deg,#071025 0%, #081126 40%, #071022 100%);}
-    .wrap{max-width:900px;margin:48px auto;padding:24px;}
 
-    .nav{display:flex;gap:12px;margin-bottom:18px;align-items:center}
-    .nav a{color:var(--accent);text-decoration:none;font-weight:600}
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      background: linear-gradient(180deg, #071025 0%, #081126 40%, #071022 100%);
+    }
 
-    .page-hero{
-      position:relative;
-      padding:28px;border-radius:16px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      box-shadow: 0 6px 30px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
-      overflow:hidden;
+    .wrap {
+      max-width: 900px;
+      margin: 48px auto;
+      padding: 24px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+      align-items: center
+    }
+
+    .nav a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600
+    }
+
+    .page-hero {
+      position: relative;
+      padding: 28px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      box-shadow: 0 6px 30px rgba(2, 6, 23, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+      overflow: hidden;
       border: 1px solid var(--glass-border);
       backdrop-filter: blur(8px) saturate(120%);
     }
 
-    .blob{
-      position:absolute;filter:blur(36px);opacity:0.9;mix-blend-mode:screen;border-radius:50%;
+    .blob {
+      position: absolute;
+      filter: blur(36px);
+      opacity: 0.9;
+      mix-blend-mode: screen;
+      border-radius: 50%;
       animation: float 8s ease-in-out infinite;
     }
-    .blob.b1{width:320px;height:320px;left:-80px;top:-60px;background:linear-gradient(45deg,#6dd3ff,#8a7cff);animation-duration:10s}
-    .blob.b2{width:240px;height:240px;right:-60px;top:40px;background:linear-gradient(45deg,#ffb199,#ff8ab6);animation-duration:12s}
-    .blob.b3{width:180px;height:180px;left:40%;bottom:-60px;background:linear-gradient(45deg,#9affc8,#6ad3ff);animation-duration:14s}
 
-    @keyframes float{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-18px) scale(1.03)}100%{transform:translateY(0) scale(1)}}
+    .blob.b1 {
+      width: 320px;
+      height: 320px;
+      left: -80px;
+      top: -60px;
+      background: linear-gradient(45deg, #6dd3ff, #8a7cff);
+      animation-duration: 10s
+    }
 
-    .glass-card{position:relative;padding:28px;border-radius:12px;background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter: blur(10px) saturate(130%);}
+    .blob.b2 {
+      width: 240px;
+      height: 240px;
+      right: -60px;
+      top: 40px;
+      background: linear-gradient(45deg, #ffb199, #ff8ab6);
+      animation-duration: 12s
+    }
 
-    h1{margin:0 0 6px 0;font-size:28px}
-    .meta{color:#9fb1c9;font-size:13px;margin-bottom:16px}
-    article p{line-height:1.75;color:#dcebf9}
+    .blob.b3 {
+      width: 180px;
+      height: 180px;
+      left: 40%;
+      bottom: -60px;
+      background: linear-gradient(45deg, #9affc8, #6ad3ff);
+      animation-duration: 14s
+    }
 
-    .back{display:inline-block;margin-top:18px;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--accent);text-decoration:none}
+    @keyframes float {
+      0% {
+        transform: translateY(0) scale(1)
+      }
 
-    @media (max-width:600px){.wrap{margin:18px;padding:16px} .blob{display:none}}
+      50% {
+        transform: translateY(-18px) scale(1.03)
+      }
+
+      100% {
+        transform: translateY(0) scale(1)
+      }
+    }
+
+    .glass-card {
+      position: relative;
+      padding: 28px;
+      border-radius: 12px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px) saturate(130%);
+    }
+
+    h1 {
+      margin: 0 0 6px 0;
+      font-size: 28px
+    }
+
+    .meta {
+      color: #9fb1c9;
+      font-size: 13px;
+      margin-bottom: 16px
+    }
+
+    article p {
+      line-height: 1.75;
+      color: #dcebf9
+    }
+
+    .back {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: transparent;
+      color: var(--accent);
+      text-decoration: none
+    }
+
+    @media (max-width:600px) {
+      .wrap {
+        margin: 18px;
+        padding: 16px
+      }
+
+      .blob {
+        display: none
+      }
+    }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <nav class="nav">
@@ -65,33 +166,24 @@
 
       <div class="glass-card">
         <header>
-            <h1>如何在VMware中解锁MacOS选项</h1>
-                    <p class="meta">2026-1-28-KoaSayi</p>
-</header>
+          <h1>114514</h1>
+          <p class="meta">2026-1-28-KoaSayi</p>
+        </header>
 
         <article>
-            <p>众所周知，VMware中新建虚拟机时，选择操作操作系统并没有MacOS选项</p>
+          <p>Homo</p>
 
-            <p>那么我们怎么在VMware安装MacOS呢喵</p>
+          <blockquote style="margin:18px 0;padding:12px;border-left:3px solid rgba(255,255,255,0.06);color:#cfe9ff">
+            �Ӿ�Ч���ѵ���Ȩ������������ԡ�</blockquote>
 
-            <h2>准备工作</h2>
-            <p>可以在下面链接中下载所需文件</p>
-            <p><a href="https://pan.huang1111.cn/s/vVGwNsE"> unlocker文件 </a></p>
-            <h2>解锁MacOS选项</h2>
-            <p>解压unlocker.zip</p>
-            <p>关闭所有VMware相关进程</p>
-            <p>打开unlocker427\windows, 找到unlocker.exe,以管理员身份运行</p>
-            <p>等待命令行窗口自动关闭</p>
+          <p>�Ƽ���ͨ����ʽ���뵽 `styles.css` ����վ������ҳ�渴�ã������ظ�������ά����</p>
 
-            <blockquote style="margin:18px 0;padding:12px;border-left:3px solid rgba(255,255,255,0.06);color:#cfe9ff">�Ӿ�Ч���ѵ���Ȩ������������ԡ�</blockquote>
-
-            <p>�Ƽ���ͨ����ʽ���뵽 `styles.css` ����վ������ҳ�渴�ã������ظ�������ά����</p>
-
-            <a class="back" href="index.html">�ص���ҳ</a>
+          <a class="back" href="index.html">�ص���ҳ</a>
         </article>
       </div>
     </section>
 
   </div>
 </body>
+
 </html>
