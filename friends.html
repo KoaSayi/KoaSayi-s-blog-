@@ -13,7 +13,6 @@
 </head>
 
 <body>
-    <p> 该网页可能保留，亦有可能移除，具体以发布正式版的KoaSayi网站时的情况为准。</p>
     <header class="site-header">
         <div class="wrap">
             <h1 class="site-title">Friends</h1>
@@ -21,6 +20,30 @@
             <button id="theme-toggle-friends" class="theme-toggle" aria-label="切换主题">换!</button>
         </div>
     </header>
+
+    <!-- Add site navigation (same style as index) -->
+    <nav class="site-nav">
+      <div class="wrap">
+        <a href="index.html">home</a>
+        <a href="friends.html">Friends</a>
+        <a href="about.html">about</a>
+        <div class="actions" style="margin-left:12px;">
+          <a class="nav-action" id="nav-home" href="index.html"><span>KoaSayi</span></a>
+          <a class="nav-action" id="nav-furina" href="https://furina64.dpdns.org/openlist" target="_blank" rel="noopener"><span>FurinaFile</span></a>
+          <button class="nav-action" id="nav-search" type="button" aria-label="Search"><span>Search</span></button>
+          <a class="nav-action" id="nav-issues" href="https://github.com/KoaSayi/KoaSayi-s-blog-/issues" target="_blank" rel="noopener"><span>issues</span></a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Search overlay (shared UI) -->
+    <div id="search-overlay" aria-hidden="true">
+      <div class="search-bar" role="dialog" aria-label="Search">
+        <input class="search-input" id="search-input" placeholder="输入搜索关键词..." />
+        <div class="search-hint">搜索文章标题中的任意字符</div>
+      </div>
+      <div class="search-results" id="search-results" aria-live="polite"></div>
+    </div>
 
     <main class="wrap">
         <section class="friends-hero">
@@ -173,6 +196,45 @@
         loadFriends().then(() => {
             setupMouseGlow();
         });
+
+        // ========== Add basic nav/search behavior (shared with index) ==========
+        function openSearch() {
+          const overlay = document.getElementById('search-overlay');
+          const bar = overlay && overlay.querySelector('.search-bar');
+          if (!overlay) return;
+          overlay.classList.add('visible');
+          if (bar) bar.classList.add('visible');
+          overlay.setAttribute('aria-hidden', 'false');
+          setTimeout(() => { try { const inp = document.getElementById('search-input'); inp && inp.focus(); } catch (e) {} }, 120);
+        }
+        function closeSearch() {
+          const overlay = document.getElementById('search-overlay');
+          if (!overlay) return;
+          const bar = overlay.querySelector('.search-bar');
+          if (bar) bar.classList.remove('visible');
+          overlay.classList.remove('visible');
+          overlay.setAttribute('aria-hidden', 'true');
+          const results = document.getElementById('search-results');
+          results && results.classList.remove('visible');
+          // clear after transition
+          const onTransitionEnd = (e) => { if (e.target !== overlay || e.propertyName !== 'opacity') return; try { results && (results.innerHTML = ''); const inp = document.getElementById('search-input'); inp && (inp.value = ''); } catch (e) {} overlay.removeEventListener('transitionend', onTransitionEnd); };
+          overlay.addEventListener('transitionend', onTransitionEnd);
+        }
+
+        // wire up nav actions
+        try {
+          const navHome = document.getElementById('nav-home');
+          const navFurina = document.getElementById('nav-furina');
+          const navSearch = document.getElementById('nav-search');
+          const navIssues = document.getElementById('nav-issues');
+          if (navHome) navHome.addEventListener('click', e => { e.preventDefault(); location.href = 'index.html'; });
+          if (navFurina) navFurina.addEventListener('click', () => {});
+          if (navIssues) navIssues.addEventListener('click', () => {});
+          if (navSearch) navSearch.addEventListener('click', openSearch);
+          const overlay = document.getElementById('search-overlay');
+          if (overlay) overlay.addEventListener('click', e => { if (e.target === overlay) closeSearch(); });
+          document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSearch(); });
+        } catch (e) { /* ignore */ }
 
         function setupMouseGlow() {
             const container = document.getElementById('friends-grid');
