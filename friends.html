@@ -21,6 +21,8 @@
         </div>
     </header>
 
+    <div id="cookie-points" aria-hidden="true"></div>
+
     <!-- Add site navigation (same style as index) -->
     <nav class="site-nav">
       <div class="wrap">
@@ -196,6 +198,9 @@
         loadFriends().then(() => {
             setupMouseGlow();
         });
+
+        // show cookie points if available
+        try { if (window.KoaSayiCookie && typeof window.KoaSayiCookie.updatePointsDisplay === 'function') { window.KoaSayiCookie.updatePointsDisplay(); } else { const pts = parseInt(localStorage.getItem('cookie_points')||'0',10)||0; const el=document.getElementById('cookie-points'); if (el) { if (pts) { el.textContent=`Cookies: ${pts}`; el.classList.add('visible'); el.setAttribute('aria-hidden','false'); } else { el.classList.remove('visible'); el.setAttribute('aria-hidden','true'); } } } } catch (e) {}
 
         // ========== Add basic nav/search behavior (shared with index) ==========
         function openSearch() {

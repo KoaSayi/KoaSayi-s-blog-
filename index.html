@@ -79,6 +79,8 @@
     </div>
   </header>
 
+  <div id="cookie-points" aria-hidden="true"></div>
+
   <nav class="site-nav">
     <div class="wrap">
       <a href="#">home</a>
@@ -92,6 +94,18 @@
       </div>
     </div>
   </nav>
+
+  <!-- Cookie consent popup (interactive) -->
+  <div id="cookie-popup" class="hidden" role="dialog" aria-label="Cookie consent">
+    <button class="cp-close" aria-label="关闭">✕</button>
+    <div class="cp-title">您是否要接受所有 cookies？</div>
+    <div class="cp-body">从KoaSayi不知道哪来的点子，反正你接不接受吧。</div>
+    <div class="cp-actions">
+      <div class="cookie-action blue" id="cookie-accept">接受cookies</div>
+      <div class="cookie-action blue partial" id="cookie-partial">接受部分cookies</div>
+      <div class="cookie-action reject" id="cookie-reject">拒绝</div>
+    </div>
+  </div>
 
   <!-- Search overlay -->
   <div id="search-overlay" aria-hidden="true">
@@ -116,7 +130,7 @@
       <article class="post">
         <h2 class="post-title">正式文章：离谱的事。</h2>
         <p class="post-meta" style="">2025-12-11 · 分类：Koa现实Sayi-</p>
-        <p>何意味。</p>
+        <p>何意义。</p>
         <p><a class="read-more" href="post-detail.html">阅读更多 →</a></p>
       </article>
 
@@ -330,6 +344,108 @@
 
       // close search with ESC globally
       document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSearch(); } });
+
+      // ---------- Cookie consent logic ----------
+      const cookiePopup = document.getElementById('cookie-popup');
+      const cookieAccept = document.getElementById('cookie-accept');
+      const cookiePartial = document.getElementById('cookie-partial');
+      const cookieReject = document.getElementById('cookie-reject');
+      const cookieClose = cookiePopup && cookiePopup.querySelector('.cp-close');
+      const cookiePointsEl = document.getElementById('cookie-points');
+
+      // Keys in localStorage:
+      // "cookie_points" -> integer total points
+      // "cookie_prompt_info" -> { date: 'YYYY-MM-DD', count: number, lastTs: epoch }
+
+      function readPromptInfo() {
+        try { const s = localStorage.getItem('cookie_prompt_info'); return s ? JSON.parse(s) : { date: null, count: 0, lastTs: 0 }; } catch (e) { return { date: null, count: 0, lastTs: 0 }; }
+      }
+      function writePromptInfo(info) { try { localStorage.setItem('cookie_prompt_info', JSON.stringify(info)); } catch (e) {} }
+
+      function canPromptNow() {
+        const info = readPromptInfo();
+        const now = Date.now();
+        const today = new Date().toISOString().slice(0,10);
+        if (info.date !== today) {
+          // reset daily
+          info.date = today; info.count = 0; info.lastTs = 0; writePromptInfo(info);
+        }
+        if (info.count >= 10) return false;
+        if (now - (info.lastTs || 0) < 30 * 60 * 1000) return false; // must be > 30 minutes
+        return true;
+      }
+
+      function recordPrompt() {
+        const info = readPromptInfo();
+        const now = Date.now();
+        const today = new Date().toISOString().slice(0,10);
+        if (info.date !== today) { info.date = today; info.count = 1; info.lastTs = now; }
+        else { info.count = (info.count || 0) + 1; info.lastTs = now; }
+        writePromptInfo(info);
+      }
+
+      function readPoints() { try { return parseInt(localStorage.getItem('cookie_points')||'0',10)||0; } catch (e) { return 0; } }
+      function writePoints(v) { try { localStorage.setItem('cookie_points', String(v)); } catch (e) {} }
+
+      function updatePointsDisplay() {
+        const pts = readPoints();
+        if (!pts) {
+          cookiePointsEl.classList.remove('visible');
+          cookiePointsEl.setAttribute('aria-hidden','true');
+        } else {
+          cookiePointsEl.classList.add('visible');
+          cookiePointsEl.setAttribute('aria-hidden','false');
+          cookiePointsEl.textContent = `Cookies: ${pts}`;
+        }
+      }
+
+      // show popup only on index (as requested) but points are shared across pages
+      function maybeShowCookiePopup() {
+        // Do not interrupt if popup already dismissed this session
+        if (!cookiePopup) return;
+        const dismissed = sessionStorage.getItem('cookie_popup_dismissed');
+        if (dismissed) return;
+        if (!canPromptNow()) return;
+        // show
+        cookiePopup.classList.remove('hidden');
+        recordPrompt();
+      }
+
+      function closeCookiePopup(rememberSession=true) {
+        if (!cookiePopup) return;
+        cookiePopup.classList.add('hidden');
+        if (rememberSession) sessionStorage.setItem('cookie_popup_dismissed','1');
+      }
+
+      if (cookieClose) cookieClose.addEventListener('click', e => { e.preventDefault(); closeCookiePopup(true); });
+
+      if (cookieAccept) cookieAccept.addEventListener('click', () => {
+        const cur = readPoints();
+        writePoints(cur + 10);
+        updatePointsDisplay();
+        closeCookiePopup(true);
+      });
+      if (cookiePartial) cookiePartial.addEventListener('click', () => {
+        const cur = readPoints();
+        writePoints(cur + 5);
+        updatePointsDisplay();
+        closeCookiePopup(true);
+      });
+      if (cookieReject) cookieReject.addEventListener('click', () => {
+        // do not store points; simply dismiss
+        closeCookiePopup(true);
+      });
+
+      // initialize points display on load
+      updatePointsDisplay();
+
+      // attempt to show popup after page load (not to block render)
+      window.addEventListener('load', () => {
+        setTimeout(() => { try { maybeShowCookiePopup(); } catch (e) {} }, 800);
+      });
+
+      // expose update function for other pages to call on their load
+      window.KoaSayiCookie = { updatePointsDisplay };
 
       // ---------- Aero shatter logic ----------
       function resetCount(card) {

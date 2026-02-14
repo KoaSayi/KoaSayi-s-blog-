@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 <head>
-  <meta charset="gb1032" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>About - KoaSayi</title>
   <script>
@@ -22,10 +22,12 @@
   <header class="site-header">
     <div class="wrap">
       <h1 class="site-title">KoaSayi</h1>
-      <p class="site-desc">IT-服务、交流与发展</p>
-      <button id="theme-toggle" class="theme-toggle" aria-label="切换主题">换！</button>
+      <p class="site-desc">IT-���񡢽����뷢չ</p>
+      <button id="theme-toggle" class="theme-toggle" aria-label="�л�����">����</button>
     </div>
   </header>
+
+  <div id="cookie-points" aria-hidden="true"></div>
 
   <nav class="site-nav">
     <div class="wrap">
@@ -44,8 +46,8 @@
   <!-- Search overlay -->
   <div id="search-overlay" aria-hidden="true">
     <div class="search-bar" role="dialog" aria-label="Search">
-      <input class="search-input" id="search-input" placeholder="输入搜索关键词..." />
-      <div class="search-hint">搜索文章标题中的任意字符</div>
+      <input class="search-input" id="search-input" placeholder="���������ؼ���..." />
+      <div class="search-hint">�������±����е������ַ�</div>
     </div>
     <div class="search-results" id="search-results" aria-live="polite"></div>
   </div>
@@ -54,30 +56,30 @@
     <section class="content">
 
       <article class="post aero-card" data-crack="2">
-        <h2 class="post-title">关于 KoaSayi</h2>
-        <p class="post-meta">最后更新：2026-02-12</p>
+        <h2 class="post-title">���� KoaSayi</h2>
+        <p class="post-meta">�����£�2026-02-12</p>
         <p>
         </p>
-        <p>KoaSayi接下来展示你可以联系的社交软体</p>
+        <p>KoaSayi������չʾ�������ϵ���罻����</p>
       </article>
 
-      <!-- Frutiger Aero: 社交链接玻璃方块 -->
+      <!-- Frutiger Aero: �罻���Ӳ������� -->
       <div class="aero-grid" style="margin-top:1rem;">
         <a class="aero-card" href="https://space.bilibili.com/582023723" target="_blank" rel="noopener" data-crack="1">
           <h4>bilibili</h4>
-          <p>糯米涨价了</p>
+          <p>Ŵ���Ǽ���</p>
         </a>
         <a class="aero-card" href="https://discord.com/" target="_blank" rel="noopener" data-crack="2">
           <h4>discord</h4>
-          <p>注意,此链接会跳转到Discord官网,请在App端中点击好友-添加好友-输入KoaSayi-发送好友请求</p>
+          <p>ע��,�����ӻ���ת��Discord����,����App���е������-��Ӻ���-����KoaSayi-���ͺ�������</p>
         </a>
         <a class="aero-card" href="https://www.youtube.com/@KoaSayi" target="_blank" rel="noopener" data-crack="3">
           <h4>youtube</h4>
-          <p>不常看YT</p>
+          <p>������YT</p>
         </a>
         <a class="aero-card" href="https://github.com/KoaSayi" target="_blank" rel="noopener" data-crack="1">
           <h4>github</h4>
-          <p>项目用AI</p>
+          <p>��Ŀ��AI</p>
         </a>
       </div>
 
@@ -91,7 +93,7 @@
 
       <div class="card">
         <h3>contact</h3>
-        <p>邮箱：<a href="mailto:hdb97028@gmail.com">hdb97028@gmail.com</a></p>
+        <p>���䣺<a href="mailto:hdb97028@gmail.com">hdb97028@gmail.com</a></p>
       </div>
 
     </aside>
@@ -99,12 +101,12 @@
 
   <footer class="site-footer">
     <div class="wrap">
-      <p>? 2025 KoaSayi。</p>
+      <p>? 2025 KoaSayi��</p>
     </div>
   </footer>
 
-  <!-- 修复玻璃按钮（默认隐藏） -->
-  <button id="repair-btn" aria-hidden="true">一键修复</button>
+  <!-- �޸�������ť��Ĭ�����أ� -->
+  <button id="repair-btn" aria-hidden="true">һ���޸�</button>
 
   <script>
     (function () {
@@ -123,7 +125,7 @@
 
       function updateIcon() {
         const isDark = doc.getAttribute('data-theme') === 'dark';
-        if (toggle) toggle.textContent = isDark ? '我怕暗' : '我怕亮';
+        if (toggle) toggle.textContent = isDark ? '���°�' : '������';
       }
 
       if (toggle) {
@@ -196,10 +198,15 @@
         searchResults.classList.add('visible');
       }
 
-      function showNoResults() { searchResults.innerHTML = ''; const div=document.createElement('div'); div.className='no-results'; div.textContent='未找到结果'; searchResults.appendChild(div); searchResults.classList.add('visible'); }
+      function showNoResults() { searchResults.innerHTML = ''; const div=document.createElement('div'); div.className='no-results'; div.textContent='δ�ҵ����'; searchResults.appendChild(div); searchResults.classList.add('visible'); }
 
       if (searchInput) { let typingTimer=null; searchInput.addEventListener('input', e=>{ clearTimeout(typingTimer); typingTimer=setTimeout(()=>runSearch(e.target.value),220); }); searchInput.addEventListener('keydown', e=>{ if (e.key==='Escape') { if (searchOverlay) { searchOverlay.classList.remove('visible'); searchOverlay.setAttribute('aria-hidden','true'); } } if (e.key==='Enter') runSearch(e.target.value); }); }
       document.addEventListener('keydown', e=>{ if (e.key==='Escape') { if (searchOverlay) { searchOverlay.classList.remove('visible'); searchOverlay.setAttribute('aria-hidden','true'); } } });
+
+      // Show cookie points if available (shared via localStorage)
+      try { if (window.KoaSayiCookie && typeof window.KoaSayiCookie.updatePointsDisplay === 'function') { window.KoaSayiCookie.updatePointsDisplay(); } else { // fallback read directly
+          const pts = parseInt(localStorage.getItem('cookie_points')||'0',10)||0; const el=document.getElementById('cookie-points'); if (el) { if (pts) { el.textContent=`Cookies: ${pts}`; el.classList.add('visible'); el.setAttribute('aria-hidden','false'); } else { el.classList.remove('visible'); el.setAttribute('aria-hidden','true'); } }
+        } } catch (e) {}
 
     })();
   </script>
@@ -411,6 +418,5 @@
     })();
   </script>
 </body>
-
 
 </html>
