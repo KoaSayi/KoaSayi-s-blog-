@@ -57,8 +57,41 @@
     /* Hover lift for visual polish */
     .post:hover, .aero-card:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(2,8,20,0.65); transition: all .22s ease; }
 
+    /* New: glass title bar and pinned badge for first article */
+    .pinned-post { position: relative; padding-top: 46px; }
+    .pinned-post .pinned {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: linear-gradient(135deg, rgba(239,68,68,0.95), rgba(220,38,38,0.9));
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-weight: 700;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.45);
+      border: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(6px);
+      z-index: 10;
+      font-size: 13px;
+    }
+    .title-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 6px 18px rgba(2,8,20,0.18);
+      color: inherit;
+    }
+    .title-bar .post-title { margin: 0; font-size: 1.125rem; padding: 0; display: block; background: transparent; }
+
     @media (max-width: 520px) {
       .post .post-title, .post .post-meta, .post p { display: block; padding: 8px; }
+      .pinned-post { padding-top: 56px; }
+      .pinned-post .pinned { top: 8px; left: 8px; }
     }
   </style>
 </head>
@@ -84,8 +117,8 @@
   <nav class="site-nav">
     <div class="wrap">
       <a href="#">home</a>
-      <a href="friends.html">Friends</a>
-      <a href="about.html">about</a>
+      <a href="web/friends.html">Friends</a>
+      <a href="web/about.html">about</a>
       <div class="actions" style="margin-left:12px;">
         <a class="nav-action" id="nav-home" href="index.html"><span>KoaSayi</span></a>
         <a class="nav-action" id="nav-furina" href="https://furina64.dpdns.org/openlist" target="_blank" rel="noopener"><span>FurinaFile</span></a>
@@ -111,7 +144,7 @@
   <div id="search-overlay" aria-hidden="true">
     <div class="search-bar" role="dialog" aria-label="Search">
       <input class="search-input" id="search-input" placeholder="输入搜索关键词..." />
-      <div class="search-hint">搜索文章标题中的任意字符</div>
+      <div class="search-hint">搜索文章......</div>
     </div>
     <div class="search-results" id="search-results" aria-live="polite"></div>
   </div>
@@ -119,19 +152,34 @@
   <main class="wrap main-grid">
     <section class="content">
 
+      <!-- New pinned glass title article (Cookies 不是真的 Cookies) -->
+      <article class="post pinned-post">
+        <div class="pinned">置顶</div>
+        <div class="title-bar">
+          <h2 class="post-title">Cookies不是真的Cookies</h2>
+          <div class="title-meta">说明 · 快速查看</div>
+        </div>
+        <p class="post-meta">2026-02-14 · KoaSayi</p>
+        <p>“Cookies 点数”与浏览器存储相关，不上传个人信息。点击此玻璃栏左下角一口气看到大结局</p>
+        <p><a class="read-more" href="web/Writing/Cookiesinformation.html">阅读更多 →</a></p>
+      </article>
+
       <article class="post">
-        <h2 class="post-title">此网页还在开发中！</h2>
+        <div class="title-bar">
+          <h2 class="post-title">此网页还在开发中！</h2>
+          <div class="title-meta">快速导览</div>
+        </div>
         <p class="post-meta">2025-12-04 · 分类：- · 阅读：- 分钟</p>
         <p>正在重拾自己的博客计划。
           目前打算想办法把之前写的一些文章整理出来，放到这个博客上..</p>
-        <p><a class="read-more" href="#">阅读更多 →</a></p>
+        <p><a class="read-more" href="web/Writing/post-detail.html">阅读更多 →</a></p>
       </article>
 
       <article class="post">
         <h2 class="post-title">正式文章：离谱的事。</h2>
         <p class="post-meta" style="">2025-12-11 · 分类：Koa现实Sayi-</p>
         <p>何意义。</p>
-        <p><a class="read-more" href="post-detail.html">阅读更多 →</a></p>
+        <p><a class="read-more" href="web/Writing/post-detail.html">阅读更多 →</a></p>
       </article>
 
     </section>
@@ -260,8 +308,8 @@
         searchResults && searchResults.classList.remove('visible');
 
         // wait for overlay transition to finish before clearing content so fade-out is visible
-        const onTransitionEnd = (e) => {
-          if (e.target !== searchOverlay || e.propertyName !== 'opacity') return;
+        const onTransitionEnd = (ev) => {
+          if (ev.target !== searchOverlay || ev.propertyName !== 'opacity') return;
           try { searchResults && (searchResults.innerHTML = ''); } catch (e) {}
           try { if (searchInput) searchInput.value = ''; } catch (e) {}
           searchOverlay.removeEventListener('transitionend', onTransitionEnd);
@@ -355,7 +403,7 @@
 
       // Keys in localStorage:
       // "cookie_points" -> integer total points
-      // "cookie_prompt_info" -> { date: 'YYYY-MM-DD', count: number, lastTs: epoch }
+      // "cookie_prompt_info" -> { date: 'YYYY-MM-DD', count: number, lastTs: 0 }
 
       function readPromptInfo() {
         try { const s = localStorage.getItem('cookie_prompt_info'); return s ? JSON.parse(s) : { date: null, count: 0, lastTs: 0 }; } catch (e) { return { date: null, count: 0, lastTs: 0 }; }
@@ -731,4 +779,4 @@
   </script>
 </body>
 
-</html>
+</html></html>

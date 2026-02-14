@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>如何在VMware中解锁MacOS选项-KoaSayi</title>
+  <link rel="stylesheet" href="../../styles.css" />
+  <script>
+    // Apply stored theme early to prevent flash
+    (function(){
+      try {
+        var s = localStorage.getItem('theme');
+        if (s) document.documentElement.setAttribute('data-theme', s);
+        else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.setAttribute('data-theme','dark');
+      } catch (e) { /* ignore */ }
+    })();
+  </script>
+  <style>
+    :root {
+      --bg: #0f1724;
+      --glass-bg: rgba(255, 255, 255, 0.06);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --accent: rgba(120, 200, 255, 0.12);
+      color-scheme: dark;
+      color: #e6eef8;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, "Noto Sans SC";
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      /* use transparent so global background from styles.css shows through and avoids visual cut/gap */
+      background: transparent;
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 900px;
+      margin: 48px auto;
+      padding: 24px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+      align-items: center
+    }
+
+    .nav a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600
+    }
+
+    .page-hero {
+      position: relative;
+      padding: 28px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      box-shadow: 0 6px 30px rgba(2, 6, 23, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+      overflow: hidden;
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(8px) saturate(120%);
+    }
+
+    .blob {
+      position: absolute;
+      filter: blur(36px);
+      opacity: 0.9;
+      mix-blend-mode: screen;
+      border-radius: 50%;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .blob.b1 {
+      width: 320px;
+      height: 320px;
+      left: -80px;
+      top: -60px;
+      background: linear-gradient(45deg, #6dd3ff, #8a7cff);
+      animation-duration: 10s
+    }
+
+    .blob.b2 {
+      width: 240px;
+      height: 240px;
+      right: -60px;
+      top: 40px;
+      background: linear-gradient(45deg, #ffb199, #ff8ab6);
+      animation-duration: 12s
+    }
+
+    .blob.b3 {
+      width: 180px;
+      height: 180px;
+      left: 40%;
+      bottom: -60px;
+      background: linear-gradient(45deg, #9affc8, #6ad3ff);
+      animation-duration: 14s
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0) scale(1)
+      }
+
+      50% {
+        transform: translateY(-18px) scale(1.03)
+      }
+
+      100% {
+        transform: translateY(0) scale(1)
+      }
+    }
+
+    .glass-card {
+      position: relative;
+      padding: 28px;
+      border-radius: 12px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px) saturate(130%);
+    }
+
+    h1 {
+      margin: 0 0 6px 0;
+      font-size: 28px
+    }
+
+    .meta {
+      color: #9fb1c9;
+      font-size: 13px;
+      margin-bottom: 16px
+    }
+
+    article p {
+      line-height: 1.75;
+      color: #dcebf9
+    }
+
+    .back {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: transparent;
+      color: var(--accent);
+      text-decoration: none
+    }
+
+    @media (max-width:600px) {
+      .wrap {
+        margin: 18px;
+        padding: 16px
+      }
+
+      .blob {
+        display: none
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- theme toggle button (fixed via styles.css) -->
+  <button id="theme-toggle" class="theme-toggle" aria-label="切换主题">换！</button>
+
+  <!-- small fixed site-nav (same circular icons as index) -->
+  <nav class="site-nav" aria-hidden="false">
+    <div class="wrap">
+      <a href="../../index.html">home</a>
+      <a href="../friends.html">Friends</a>
+      <a href="../about.html">about</a>
+    </div>
+  </nav>
+
+  <div class="wrap">
+    <nav class="nav">
+      <a href="../../index.html">返回首页</a>
+      <a href="#comments">评论</a>
+    </nav>
+
+    <section class="page-hero">
+      <div class="blob b1" aria-hidden="true"></div>
+      <div class="blob b2" aria-hidden="true"></div>
+      <div class="blob b3" aria-hidden="true"></div>
+
+      <div class="glass-card">
+        <header>
+          <h1>114514</h1>
+          <p class="meta">2026-1-28-KoaSayi</p>
+        </header>
+
+        <article>
+          <p>Homo</p>
+
+          <blockquote style="margin:18px 0;padding:12px;border-left:3px solid rgba(255,255,255,0.06);color:#cfe9ff">
+            �Ӿ�Ч���ѵ���Ȩ������������ԡ�</blockquote>
+
+          <p>�Ƽ���ͨ����ʽ���뵽 `styles.css` ����վ������ҳ�渴�ã������ظ�������ά����</p>
+
+          <a class="back" href="../../index.html">返回首页</a>
+        </article>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    (function () {
+      const doc = document.documentElement;
+      const toggle = document.getElementById('theme-toggle');
+
+      function updateIcon() {
+        const isDark = doc.getAttribute('data-theme') === 'dark';
+        if (toggle) toggle.textContent = isDark ? '我怕暗' : '我怕亮';
+      }
+
+      if (toggle) {
+        toggle.addEventListener('click', () => {
+          const isDark = doc.getAttribute('data-theme') === 'dark';
+          const next = isDark ? 'light' : 'dark';
+          doc.setAttribute('data-theme', next);
+          try { localStorage.setItem('theme', next); } catch (e) {}
+          updateIcon();
+        });
+      }
+
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+          try {
+            if (!localStorage.getItem('theme')) {
+              doc.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+              updateIcon();
+            }
+          } catch (err) { /* ignore */ }
+        });
+      }
+
+      updateIcon();
+    })();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KoaSayi-Friends!</title>
+    <script>
+      // apply stored theme early to reduce flash
+      (function(){ try { var s = localStorage.getItem('theme'); if (s) document.documentElement.setAttribute('data-theme', s); else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.setAttribute('data-theme','dark'); } catch(e){} })();
+    </script>
+    <link rel="stylesheet" href="../styles.css" />
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="wrap">
+            <h1 class="site-title">Friends</h1>
+            <p class="site-desc">是你们造就了现在的我..对此感激不尽!</p>
+            <button id="theme-toggle-friends" class="theme-toggle" aria-label="切换主题">换!</button>
+        </div>
+    </header>
+
+    <div id="cookie-points" aria-hidden="true"></div>
+
+    <!-- Add site navigation (same style as index) -->
+    <nav class="site-nav">
+      <div class="wrap">
+        <a href="../index.html">home</a>
+        <a href="friends.html">Friends</a>
+        <a href="about.html">about</a>
+        <div class="actions" style="margin-left:12px;">
+          <a class="nav-action" id="nav-home" href="../index.html"><span>KoaSayi</span></a>
+          <a class="nav-action" id="nav-furina" href="https://furina64.dpdns.org/openlist" target="_blank" rel="noopener"><span>FurinaFile</span></a>
+          <button class="nav-action" id="nav-search" type="button" aria-label="Search"><span>Search</span></button>
+          <a class="nav-action" id="nav-issues" href="https://github.com/KoaSayi/KoaSayi-s-blog-/issues" target="_blank" rel="noopener"><span>issues</span></a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Search overlay (shared UI) -->
+    <div id="search-overlay" aria-hidden="true">
+      <div class="search-bar" role="dialog" aria-label="Search">
+        <input class="search-input" id="search-input" placeholder="输入搜索关键词..." />
+        <div class="search-hint">搜索文章标题中的任意字符</div>
+      </div>
+      <div class="search-results" id="search-results" aria-live="polite"></div>
+    </div>
+
+    <main class="wrap">
+        <section class="friends-hero">
+            <h2>Friends</h2>
+            <p>点击标题就能访问对方站点..应该吧?</p>
+        </section>
+
+        <section class="friends-grid" id="friends-grid">
+            <!-- 由 tools/friends.json 动态渲染友链卡片 -->
+        </section>
+
+        <p style="margin-top:1rem"><a href="../index.html">← 返回首页</a></p>
+    </main>
+
+    <footer class="site-footer">
+        <div class="wrap footer-row">
+            <p>© 2025 KoaSayi。</p>
+            <div class="footer-right"><a class="friend-link-btn" href="friends.html">副驾驶把友链的链接页放这来了，我不知道为什么..</a></div>
+        </div>
+    </footer>
+
+</body>
+
+<script>
+    (function () {
+        const toggle = document.getElementById('theme-toggle-friends');
+        const doc = document.documentElement;
+        // 优先使用 localStorage 的主题设置；没有时跟随系统偏好
+        const stored = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const apply = (isDark) => {
+            doc.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            if (toggle) toggle.textContent = isDark ? '我怕暗' : '我怕亮';
+            if (toggle) toggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+        };
+        // 初始化
+        if (stored === 'dark' || (stored === null && prefersDark)) apply(true);
+        else apply(false);
+
+        if (toggle) {
+            toggle.addEventListener('click', () => {
+                const isDark = doc.getAttribute('data-theme') === 'dark';
+                const next = !isDark;
+                apply(next);
+                localStorage.setItem('theme', next ? 'dark' : 'light');
+            });
+        }
+        // 监听系统偏好变化（如果用户未设置 localStorage）
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                if (!localStorage.getItem('theme')) apply(e.matches);
+            });
+        }
+
+        // ============== 点击波纹函数 ==============
+        function createRipple(card, ev) {
+            try {
+                const rect = card.getBoundingClientRect();
+                const x = (ev.clientX || (ev.touches && ev.touches[0] && ev.touches[0].clientX)) - rect.left;
+                const y = (ev.clientY || (ev.touches && ev.touches[0] && ev.touches[0].clientY)) - rect.top;
+                const d = Math.max(rect.width, rect.height) * 2;
+                const span = document.createElement('span');
+                span.className = 'ripple';
+                span.style.width = span.style.height = d + 'px';
+                span.style.left = x + 'px';
+                span.style.top = y + 'px';
+                // center the circle
+                span.style.transform = 'translate(-50%, -50%) scale(0)';
+                card.appendChild(span);
+                // remove after animation
+                setTimeout(() => { try { span.remove(); } catch (e) { /* ignore */ } }, 800);
+            } catch (err) {
+                // ignore ripple errors
+                console.warn('ripple error', err);
+            }
+        }
+
+        // ============== friends.json 加载与渲染 ==============
+        function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        async function loadFriends() {
+            const container = document.getElementById('friends-grid');
+            if (!container) { console.warn('friends-grid not found'); return; }
+            const candidatePaths = [
+                '../tools/friends.json',
+                'tools/friends.json',
+                '../friends.json',
+                'file:///D:/KoaSayi网页存档/tools/friends.json'
+            ];
+            let list = null;
+            for (const p of candidatePaths) {
+                try {
+                    const res = await fetch(p, { cache: 'no-store' });
+                    if (!res.ok) throw new Error('fetch failed: ' + res.status + ' for ' + p);
+                    list = await res.json();
+                    break;
+                } catch (err) {
+                    console.warn('fetch failed for', p, err);
+                    // try next
+                }
+            }
+            if (!list) {
+                console.error('Failed to load friends.json from candidate paths. To run locally, start a simple HTTP server or ensure the file path is accessible.');
+                container.innerHTML = '<p>加载友链失败，请通过本地服务器或检查 tools/friends.json 路径。</p>';
+                return;
+            }
+
+            try {
+                container.innerHTML = '';
+                // 轮流/随机使用 Background 文件夹中的图片作为卡片背景
+                const bgImages = [
+                    '../image/Background/09bab1c55f9d50f524a075f812413ec4.jpg',
+                    '../image/Background/16e462450f22a5bf2ab80c72cb2f1a6f.jpg',
+                    '../image/Background/2d93c5cb8e4a78531e6847b350d12b97.jpg',
+                    '../image/Background/553798a30b922620d87f3f572f9440a4.jpg',
+                    '../image/Background/6ce40b4f0eaa4582427b0325cf2b5d1f.jpg',
+                    '../image/Background/a8d9f4b373f6daa4bc56b8bcc2a4cac3.jpg',
+                    '../image/Background/ac5c98139ff0c9cded8ec54b38363af7.jpg',
+                    '../image/Background/b4011e307d89e152b81f8df3fad96cfa.jpg',
+                    '../image/Background/ce15f7a5d8cecf21799d0d55d6f76b3e.jpg',
+                    '../image/Background/d4074536be8e639d78f022833c7b81bb.jpg',
+                    '../image/Background/f30e069e6c55f2bf90e17579a4dc65dd.jpg',
+                    '../image/Background/fcaf575bafc94910b751ce02c547f483.jpg'
+                ];
+                let idx = 0;
+                list.forEach(f => {
+                    const a = document.createElement('article');
+                    a.className = 'friend-card has-bg';
+                    // 若是 Nahida 指定使用本地 Nahidahome.jpg，否则轮流选择背景图
+                    // 如果 friends.json 指定了 bg 字段则优先使用
+                    let bg = f.bg ? String(f.bg) : null;
+                    if (!bg) {
+                        if (f.name && String(f.name).toLowerCase() === 'nahida') {
+                            bg = '../image/Background/Nahidahome.jpg';
+                        } else {
+                            // 轮流选择背景图，若想随机改为 Math.floor(Math.random()*bgImages.length)
+                            bg = bgImages[idx % bgImages.length];
+                            idx += 1;
+                        }
+                    }
+                    // if bg is a relative path in JSON, make it relative to repository root
+                    if (!/^https?:\/\//.test(bg) && !bg.startsWith('file:')) bg = String(bg).startsWith('/') ? '..' + bg : bg;
+                    a.style.backgroundImage = `url('${bg}')`;
+                    a.style.backgroundSize = 'cover';
+                    a.style.backgroundPosition = 'center';
+                    const url = f.url ? escapeHtml(f.url) : '#';
+                    a.innerHTML = `
+                        <img class="friend-avatar" src="${escapeHtml(f.avatar || '')}" alt="${escapeHtml(f.name)}">
+                        <div class="friend-meta">
+                          <h4><a href="${url}" target="_blank" rel="noopener">${escapeHtml(f.name)}</a></h4>
+                          <p>${escapeHtml(f.desc || '')}</p>
+                        </div>`;
+                    // 绑定点击水波纹，并使整个卡片可点击（跳转到 friend.url）
+                    a.style.cursor = 'pointer';
+                    a.addEventListener('pointerdown', e => {
+                        createRipple(a, e);
+                    });
+                    a.addEventListener('click', e => {
+                        // 如果点击的是内部的链接，则让链接自然跳转
+                        const inner = e.target.closest && e.target.closest('a');
+                        if (inner && inner.getAttribute('href')) return;
+                        if (f.url) {
+                            window.open(f.url, '_blank', 'noopener');
+                        }
+                    });
+                    container.appendChild(a);
+                });
+            } catch (err) {
+                console.error('loadFriends render error', err);
+                container.innerHTML = '<p>渲染友链失败，请稍后重试。</p>';
+            }
+        }
+        // 加载完后绑定鼠标移动效果
+        loadFriends().then(() => {
+            setupMouseGlow();
+        });
+
+        // show cookie points if available
+        try { if (window.KoaSayiCookie && typeof window.KoaSayiCookie.updatePointsDisplay === 'function') { window.KoaSayiCookie.updatePointsDisplay(); } else { const pts = parseInt(localStorage.getItem('cookie_points')||'0',10)||0; const el=document.getElementById('cookie-points'); if (el) { if (pts) { el.textContent=`Cookies: ${pts}`; el.classList.add('visible'); el.setAttribute('aria-hidden','false'); } else { el.classList.remove('visible'); el.setAttribute('aria-hidden','true'); } } } } catch (e) {}
+
+        // ========== Add basic nav/search behavior (shared with index) ==========
+        function openSearch() {
+          const overlay = document.getElementById('search-overlay');
+          const bar = overlay && overlay.querySelector('.search-bar');
+          if (!overlay) return;
+          overlay.classList.add('visible');
+          if (bar) bar.classList.add('visible');
+          overlay.setAttribute('aria-hidden', 'false');
+          setTimeout(() => { try { const inp = document.getElementById('search-input'); inp && inp.focus(); } catch (e) {} }, 120);
+        }
+        function closeSearch() {
+          const overlay = document.getElementById('search-overlay');
+          if (!overlay) return;
+          const bar = overlay.querySelector('.search-bar');
+          if (bar) bar.classList.remove('visible');
+          overlay.classList.remove('visible');
+          overlay.setAttribute('aria-hidden', 'true');
+          const results = document.getElementById('search-results');
+          results && results.classList.remove('visible');
+          // clear after transition
+          const onTransitionEnd = (e) => { if (e.target !== overlay || e.propertyName !== 'opacity') return; try { results && (results.innerHTML = ''); const inp = document.getElementById('search-input'); inp && (inp.value = ''); } catch (e) {} overlay.removeEventListener('transitionend', onTransitionEnd); };
+          overlay.addEventListener('transitionend', onTransitionEnd);
+        }
+
+        // wire up nav actions
+        try {
+          const navHome = document.getElementById('nav-home');
+          const navFurina = document.getElementById('nav-furina');
+          const navSearch = document.getElementById('nav-search');
+          const navIssues = document.getElementById('nav-issues');
+          if (navHome) navHome.addEventListener('click', e => { e.preventDefault(); location.href = '../index.html'; });
+          if (navFurina) navFurina.addEventListener('click', () => {});
+          if (navIssues) navIssues.addEventListener('click', () => {});
+          if (navSearch) navSearch.addEventListener('click', openSearch);
+          const overlay = document.getElementById('search-overlay');
+          if (overlay) overlay.addEventListener('click', e => { if (e.target === overlay) closeSearch(); });
+          document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSearch(); });
+        } catch (e) { /* ignore */ }
+
+        function setupMouseGlow() {
+            const container = document.getElementById('friends-grid');
+            if (!container) return;
+            let lastCard = null;
+
+            function clearCard(card) {
+                if (!card) return;
+                card.style.removeProperty('--mx');
+                card.style.removeProperty('--my');
+                card.classList.remove('hovering');
+            }
+
+            function onPointer(x, y) {
+                const el = document.elementFromPoint(x, y);
+                if (!el) return;
+                const card = el.closest && el.closest('.friend-card');
+                // 如果没有命中 card，则清理上一个被 hover 的 card 并返回
+                if (!card) {
+                    if (lastCard) clearCard(lastCard);
+                    lastCard = null;
+                    return;
+                }
+                // 防御：确保 card 有 getBoundingClientRect
+                if (typeof card.getBoundingClientRect !== 'function') {
+                    if (lastCard) clearCard(lastCard);
+                    lastCard = null;
+                    return;
+                }
+                // 到这里 card 一定存在
+                if (card === lastCard) {
+                    // 更新位置 only for lastCard
+                    const r = card.getBoundingClientRect();
+                    const px = ((x - r.left) / r.width) * 100;
+                    const py = ((y - r.top) / r.height) * 100;
+                    card.style.setProperty('--mx', Math.max(0, Math.min(100, px)) + '%');
+                    card.style.setProperty('--my', Math.max(0, Math.min(100, py)) + '%');
+                    return;
+                }
+                // moved to a new card
+                if (lastCard) clearCard(lastCard);
+                lastCard = card;
+                const r = card.getBoundingClientRect();
+                const px = ((x - r.left) / r.width) * 100;
+                const py = ((y - r.top) / r.height) * 100;
+                card.style.setProperty('--mx', Math.max(0, Math.min(100, px)) + '%');
+                card.style.setProperty('--my', Math.max(0, Math.min(100, py)) + '%');
+                card.classList.add('hovering');
+            }
+
+            container.addEventListener('mousemove', e => {
+                onPointer(e.clientX, e.clientY);
+            });
+            container.addEventListener('mouseleave', () => {
+                if (lastCard) clearCard(lastCard);
+                lastCard = null;
+            });
+
+            // touch support
+            container.addEventListener('touchmove', e => {
+                const t = e.touches[0]; if (!t) return;
+                onPointer(t.clientX, t.clientY);
+            }, { passive: true });
+            container.addEventListener('touchend', () => {
+                if (lastCard) clearCard(lastCard);
+                lastCard = null;
+            });
+        }
+
+    })();
+</script>
+
+</html>

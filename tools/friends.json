@@ -1,0 +1,35 @@
+[
+  {
+    "name": "Nahida",
+    "url": "https://nahida.im",
+    "avatar": "https://nahida.im/profile.png",
+    "bg": "image/Background/Nahidahome.jpg",
+    "desc": "为世界上一切美好而战!"
+  },
+  {
+    "name": "Furina",
+    "url": "https://furina64.dpdns.org/",
+    "avatar": "https://furina64.dpdns.org/profile.png",
+    "background": "image/Background/Furina.png",
+    "bg": "image/Background/Furina.png",
+    "desc": "开源 · 共享 · 便捷 · 实用"
+  },
+  {
+    "name": "Share121",
+    "url": "https://share121.github.io/blog/",
+    "avatar": "https://avatars.githubusercontent.com/u/111939263?v=4",
+    "desc": "分享好东西"
+  },
+  {
+    "name": "VacuolePao",
+    "url": "https://blog.vacu.top/",
+    "avatar": "https://s2.loli.net/2025/08/05/vW2pnGsJOAd6qEX.jpg",
+    "desc": "一介书生,三尺微命。"
+  },
+  {
+    "name": "sato_linmao",
+    "url": "https://halo.satolinmao.top:8443/",
+    "avatar": "https://halo.satolinmao.top:8443/upload/photo_2026-02-12_19-53-38.jpg",
+    "desc": "网络带宽与追番速度成正比"
+  }
+]
